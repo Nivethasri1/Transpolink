@@ -1,0 +1,10 @@
+com\transpolink\identity\dto\LoginRequest.class
+com\transpolink\identity\IdentityServiceApplication.class
+com\transpolink\identity\repository\UserRepository.class
+com\transpolink\identity\dto\AuthResponse.class
+com\transpolink\identity\service\UserService.class
+com\transpolink\identity\enums\Role.class
+com\transpolink\identity\dto\UserResponse.class
+com\transpolink\identity\entity\User.class
+com\transpolink\identity\enums\UserStatus.class
+com\transpolink\identity\dto\RegisterRequest.class
