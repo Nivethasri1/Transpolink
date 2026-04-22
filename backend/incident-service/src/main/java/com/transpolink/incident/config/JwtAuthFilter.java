@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -27,37 +28,36 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
-
-        // 1. Check if the Bearer token exists
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        // Case 1: came through API Gateway
+        String role = request.getHeader("X-User-Role");
+        String userId = request.getHeader("X-User-Id");
+        if (role != null && userId != null) {
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                            userId, null, List.of(new SimpleGrantedAuthority("ROLE_" + role))));
             chain.doFilter(request, response);
             return;
         }
 
-        try {
-            String token = authHeader.substring(7);
-
-            // 2. Validate and Parse the JWT using the secret from properties
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            String userId = claims.getSubject();
-            String role = claims.get("role", String.class); // Matches the claim key from Identity Service
-
-            if (userId != null && role != null) {
-                // 3. Map to Spring Authority (Add ROLE_ prefix for hasRole compatibility)
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        userId, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
-
-                SecurityContextHolder.getContext().setAuthentication(auth);
+        // Case 2: direct call with Bearer token
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                String token = authHeader.substring(7);
+                Claims claims = Jwts.parserBuilder()
+                        .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody();
+                String userRole = claims.get("role", String.class);
+                String subject = claims.getSubject();
+                SecurityContextHolder.getContext().setAuthentication(
+                        new UsernamePasswordAuthenticationToken(
+                                subject, null, List.of(new SimpleGrantedAuthority("ROLE_" + userRole))));
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
-        } catch (Exception e) {
-            // If token is expired or secret is wrong, clear context to ensure 403
-            SecurityContextHolder.clearContext();
         }
 
         chain.doFilter(request, response);
