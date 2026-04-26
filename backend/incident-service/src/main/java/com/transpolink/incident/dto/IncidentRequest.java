@@ -7,7 +7,6 @@ import lombok.Data;
 
 @Data
 public class IncidentRequest {
-    @NotNull private Long reporterId;
     @NotNull private IncidentType type;
     @NotBlank private String location;
 }

@@ -39,7 +39,6 @@ public class AuthController {
     }
 
 
-
     @DeleteMapping("/api/users/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {

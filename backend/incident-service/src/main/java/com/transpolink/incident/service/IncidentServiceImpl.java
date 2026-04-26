@@ -20,15 +20,28 @@ public class IncidentServiceImpl implements IncidentService {
     private final IncidentRepository incidentRepository;
     private final ResolutionRepository resolutionRepository;
 
+//    @Override
+//    public IncidentResponse createIncident(IncidentRequest request) {
+//        Incident incident = Incident.builder()
+//                .reporterId(request.getReporterId())
+//                .type(request.getType())
+//                .location(request.getLocation())
+//                .build();
+//        return mapToResponse(incidentRepository.save(incident));
+//    }
+
     @Override
-    public IncidentResponse createIncident(IncidentRequest request) {
+    public IncidentResponse createIncident(IncidentRequest request, Long reporterId) {
         Incident incident = Incident.builder()
-                .reporterId(request.getReporterId())
+                .reporterId(reporterId) // comes from token, not request
                 .type(request.getType())
                 .location(request.getLocation())
                 .build();
+
         return mapToResponse(incidentRepository.save(incident));
     }
+
+
 
     @Override
     public IncidentResponse getIncidentById(Long id) {
