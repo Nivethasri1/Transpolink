@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,11 +17,20 @@ public class IncidentController {
 
     private final IncidentService incidentService;
 
-    @PostMapping("/api/incidents")
-    @PreAuthorize("hasRole('CITIZEN') or hasRole('TRAFFIC_OFFICER') or hasRole('ADMIN')")
-    public ResponseEntity<IncidentResponse> create(@Valid @RequestBody IncidentRequest request) {
-        return ResponseEntity.ok(incidentService.createIncident(request));
-    }
+//    @PostMapping("/api/incidents")
+//    @PreAuthorize("hasRole('CITIZEN') or hasRole('TRAFFIC_OFFICER') or hasRole('ADMIN')")
+//    public ResponseEntity<IncidentResponse> create(@Valid @RequestBody IncidentRequest request) {
+//        return ResponseEntity.ok(incidentService.createIncident(request));
+//    }
+@PostMapping("/api/incidents")
+@PreAuthorize("hasRole('CITIZEN') or hasRole('TRAFFIC_OFFICER') or hasRole('ADMIN')")
+public ResponseEntity<IncidentResponse> create(@Valid @RequestBody IncidentRequest request,
+                                               Authentication authentication) {
+    String reporterIdStr = (String) authentication.getPrincipal();
+    Long reporterId = Long.valueOf(reporterIdStr);
+
+    return ResponseEntity.ok(incidentService.createIncident(request, reporterId));
+}
 
     @GetMapping("/api/incidents/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('COMPLIANCE_OFFICER') or hasRole('CITIZEN')")

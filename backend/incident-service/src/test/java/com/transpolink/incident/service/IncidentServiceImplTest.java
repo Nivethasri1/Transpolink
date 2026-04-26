@@ -51,11 +51,11 @@ class IncidentServiceImplTest {
     @Test
     void createIncident_success() {
         IncidentRequest req = new IncidentRequest();
-        req.setReporterId(10L); req.setType(IncidentType.ACCIDENT); req.setLocation("Main St");
+        req.setType(IncidentType.ACCIDENT); req.setLocation("Main St");
 
         when(incidentRepository.save(any(Incident.class))).thenReturn(incident);
 
-        IncidentResponse response = incidentService.createIncident(req);
+        IncidentResponse response = incidentService.createIncident(req,10L);
 
         assertThat(response.getIncidentId()).isEqualTo(1L);
         assertThat(response.getType()).isEqualTo(IncidentType.ACCIDENT);

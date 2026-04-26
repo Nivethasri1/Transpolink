@@ -44,9 +44,12 @@ class IncidentControllerTest {
     @WithMockUser
     void createIncident_returns200() throws Exception {
         IncidentRequest req = new IncidentRequest();
-        req.setReporterId(10L); req.setType(IncidentType.ACCIDENT); req.setLocation("Main St");
+        req.setType(IncidentType.ACCIDENT);
+        req.setLocation("Main St");
 
-        when(incidentService.createIncident(any())).thenReturn(buildIncidentResponse());
+        // Updated to match new service signature
+        when(incidentService.createIncident(any(IncidentRequest.class), any(Long.class)))
+                .thenReturn(buildIncidentResponse());
 
         mockMvc.perform(post("/api/incidents")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,7 +98,7 @@ class IncidentControllerTest {
                 .resolutionId(1L).incidentId(1L).officerId(5L)
                 .actions("Cleared road").date(LocalDateTime.now()).status(ResolutionStatus.PENDING).build();
 
-        when(incidentService.addResolution(any())).thenReturn(resp);
+        when(incidentService.addResolution(any(ResolutionRequest.class))).thenReturn(resp);
 
         mockMvc.perform(post("/api/resolutions")
                         .contentType(MediaType.APPLICATION_JSON)

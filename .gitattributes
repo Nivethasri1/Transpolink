@@ -1,0 +1,14 @@
+# Handle line endings consistently
+* text=auto
+
+# Java files should use LF
+*.java text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+
+# Binary files
+*.jar binary
+*.war binary
+*.png binary
+*.jpg binary
