@@ -18,13 +18,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthController.class)
-@Import(SecurityConfig.class)
+@Import(SecurityConfig.class) // bring in your custom security config
 class AuthControllerTest {
 
     @Autowired MockMvc mockMvc;
@@ -64,7 +64,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "test", roles = {"ADMIN"})
     void getUser_returns200() throws Exception {
         UserResponse resp = UserResponse.builder()
                 .userId(1L).name("Alice").role(Role.CITIZEN)
@@ -78,7 +78,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "test", roles = {"ADMIN"})
     void getAllUsers_returns200() throws Exception {
         UserResponse resp = UserResponse.builder()
                 .userId(1L).name("Alice").role(Role.CITIZEN)
@@ -91,8 +91,10 @@ class AuthControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "test", roles = {"ADMIN"})
     void deleteUser_returns204() throws Exception {
+        doNothing().when(userService).deleteUser(1L);
+
         mockMvc.perform(delete("/api/users/1"))
                 .andExpect(status().isNoContent());
     }

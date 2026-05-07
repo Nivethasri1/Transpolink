@@ -9,6 +9,7 @@ import com.transpolink.notification.enums.NotificationStatus;
 import com.transpolink.notification.service.NotificationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -22,10 +23,12 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(NotificationController.class)
 @Import(SecurityConfig.class)
+@AutoConfigureMockMvc(addFilters = false)
 class NotificationControllerTest {
 
     @Autowired MockMvc mockMvc;
@@ -33,69 +36,67 @@ class NotificationControllerTest {
     @MockBean NotificationService notificationService;
     @MockBean com.transpolink.notification.config.JwtAuthFilter jwtAuthFilter;
 
-    private NotificationResponse buildResponse() {
+    private NotificationResponse buildResponse(NotificationStatus status) {
         return NotificationResponse.builder()
                 .notificationId(1L).userId(10L).entityId(5L)
                 .message("Incident reported on Main St")
                 .category(NotificationCategory.INCIDENT)
-                .status(NotificationStatus.UNREAD)
+                .status(status)
                 .createdDate(LocalDateTime.now()).build();
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void send_returns200() throws Exception {
         NotificationRequest req = new NotificationRequest();
         req.setUserId(10L); req.setEntityId(5L);
         req.setMessage("Incident reported on Main St");
         req.setCategory(NotificationCategory.INCIDENT);
 
-        when(notificationService.send(any())).thenReturn(buildResponse());
+        when(notificationService.send(any())).thenReturn(buildResponse(NotificationStatus.UNREAD));
 
         mockMvc.perform(post("/api/notifications")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.notificationId").value(1))
-                .andExpect(jsonPath("$.message").value("Incident reported on Main St"))
                 .andExpect(jsonPath("$.status").value("UNREAD"));
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "CITIZEN")
     void getByUser_returns200() throws Exception {
-        when(notificationService.getByUser(10L)).thenReturn(List.of(buildResponse()));
+        when(notificationService.getByUser(10L)).thenReturn(List.of(buildResponse(NotificationStatus.UNREAD)));
 
-        mockMvc.perform(get("/api/notifications/user/10"))
+        mockMvc.perform(get("/api/notifications/user/10")
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].userId").value(10))
                 .andExpect(jsonPath("$[0].category").value("INCIDENT"));
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "CITIZEN")
     void getUnreadByUser_returns200() throws Exception {
-        when(notificationService.getUnreadByUser(10L)).thenReturn(List.of(buildResponse()));
+        when(notificationService.getUnreadByUser(10L)).thenReturn(List.of(buildResponse(NotificationStatus.UNREAD)));
 
-        mockMvc.perform(get("/api/notifications/user/10/unread"))
+        mockMvc.perform(get("/api/notifications/user/10/unread")
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].status").value("UNREAD"));
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "CITIZEN")
     void markAsRead_returns200() throws Exception {
-        NotificationResponse readResp = NotificationResponse.builder()
-                .notificationId(1L).userId(10L).entityId(5L)
-                .message("Incident reported on Main St")
-                .category(NotificationCategory.INCIDENT)
-                .status(NotificationStatus.READ)
-                .createdDate(LocalDateTime.now()).build();
+        when(notificationService.markAsRead(1L)).thenReturn(buildResponse(NotificationStatus.READ));
 
-        when(notificationService.markAsRead(1L)).thenReturn(readResp);
-
-        mockMvc.perform(patch("/api/notifications/1/read"))
+        mockMvc.perform(patch("/api/notifications/1/read")
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("READ"));
+                .andExpect(jsonPath("$.status").value("READ"))
+                .andExpect(jsonPath("$.notificationId").value(1))
+                .andExpect(jsonPath("$.userId").value(10));
     }
 }

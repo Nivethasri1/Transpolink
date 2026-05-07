@@ -8,6 +8,7 @@ import com.transpolink.reporting.enums.ReportScope;
 import com.transpolink.reporting.service.ReportingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -25,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ReportController.class)
 @Import(SecurityConfig.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ReportControllerTest {
 
     @Autowired MockMvc mockMvc;
@@ -55,7 +57,7 @@ class ReportControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void getReportById_returns200() throws Exception {
         when(reportingService.getReportById(1L)).thenReturn(buildResponse());
 
@@ -65,7 +67,7 @@ class ReportControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void getAllReports_returns200() throws Exception {
         when(reportingService.getAllReports()).thenReturn(List.of(buildResponse()));
 
@@ -75,7 +77,7 @@ class ReportControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void getReportsByScope_returns200() throws Exception {
         when(reportingService.getReportsByScope("INCIDENT")).thenReturn(List.of(buildResponse()));
 

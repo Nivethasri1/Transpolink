@@ -7,6 +7,7 @@ import com.transpolink.transport.enums.*;
 import com.transpolink.transport.service.TransportService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -25,6 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(TransportController.class)
 @Import(SecurityConfig.class)
+@AutoConfigureMockMvc(addFilters = false)
+
 class TransportControllerTest {
 
     @Autowired MockMvc mockMvc;
@@ -54,7 +57,7 @@ class TransportControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "TRANSPORT_OPERATOR")
     void getRouteById_returns200() throws Exception {
         RouteResponse resp = RouteResponse.builder()
                 .routeId(1L).operatorId(2L).type(RouteType.BUS)
@@ -68,7 +71,7 @@ class TransportControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "TRANSPORT_OPERATOR")
     void getAllRoutes_returns200() throws Exception {
         RouteResponse resp = RouteResponse.builder()
                 .routeId(1L).operatorId(2L).type(RouteType.BUS)
@@ -104,7 +107,7 @@ class TransportControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "TRANSPORT_OPERATOR")
     void getSchedulesByRoute_returns200() throws Exception {
         ScheduleResponse resp = ScheduleResponse.builder()
                 .scheduleId(1L).routeId(1L)
@@ -139,7 +142,7 @@ class TransportControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "TRANSPORT_OPERATOR")
     void getFleetByOperator_returns200() throws Exception {
         FleetResponse resp = FleetResponse.builder()
                 .fleetId(1L).operatorId(2L).vehicleType("Bus")

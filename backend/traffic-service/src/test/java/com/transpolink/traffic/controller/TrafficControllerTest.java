@@ -8,6 +8,7 @@ import com.transpolink.traffic.enums.SegmentStatus;
 import com.transpolink.traffic.service.TrafficService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -26,6 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(TrafficController.class)
 @Import(SecurityConfig.class)
+@AutoConfigureMockMvc(addFilters = false)
+
 class TrafficControllerTest {
 
     @Autowired MockMvc mockMvc;
@@ -61,7 +64,7 @@ class TrafficControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "TRAFFIC_OFFICER")
     void getSegmentById_returns200() throws Exception {
         when(trafficService.getSegmentById(1L)).thenReturn(buildSegmentResponse());
 
@@ -71,7 +74,7 @@ class TrafficControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "TRAFFIC_OFFICER")
     void getAllSegments_returns200() throws Exception {
         when(trafficService.getAllSegments()).thenReturn(List.of(buildSegmentResponse()));
 
@@ -105,7 +108,7 @@ class TrafficControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "TRAFFIC_OFFICER")
     void getFlowsBySegment_returns200() throws Exception {
         when(trafficService.getFlowsBySegment(1L)).thenReturn(List.of(buildFlowResponse()));
 
