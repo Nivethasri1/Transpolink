@@ -23,13 +23,13 @@ public class TrafficController {
     }
 
     @GetMapping("/api/road-segments/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('COMPLIANCE_OFFICER') or hasRole('CITIZEN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_COMPANY') or hasRole('GOVERNMENT_OFFICER') or hasRole('CITIZEN')")
     public ResponseEntity<RoadSegmentResponse> getSegment(@PathVariable Long id) {
         return ResponseEntity.ok(trafficService.getSegmentById(id));
     }
 
     @GetMapping("/api/road-segments")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('COMPLIANCE_OFFICER') or hasRole('CITIZEN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_COMPANY') or hasRole('GOVERNMENT_OFFICER') or hasRole('CITIZEN')")
     public ResponseEntity<List<RoadSegmentResponse>> getAllSegments() {
         return ResponseEntity.ok(trafficService.getAllSegments());
     }
@@ -46,8 +46,14 @@ public class TrafficController {
         return ResponseEntity.ok(trafficService.recordFlow(request));
     }
 
+    @GetMapping("/api/traffic-flows")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_COMPANY') or hasRole('GOVERNMENT_OFFICER') or hasRole('CITIZEN')")
+    public ResponseEntity<List<TrafficFlowResponse>> getAllFlows() {
+        return ResponseEntity.ok(trafficService.getAllFlows());
+    }
+
     @GetMapping("/api/traffic-flows/segment/{segmentId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('COMPLIANCE_OFFICER') or hasRole('CITIZEN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_COMPANY') or hasRole('GOVERNMENT_OFFICER') or hasRole('CITIZEN')")
     public ResponseEntity<List<TrafficFlowResponse>> getFlows(@PathVariable Long segmentId) {
         return ResponseEntity.ok(trafficService.getFlowsBySegment(segmentId));
     }

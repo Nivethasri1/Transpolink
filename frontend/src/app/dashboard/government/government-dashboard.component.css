@@ -1,0 +1,26 @@
+.page { display: flex; flex-direction: column; gap: 20px; }
+.page-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.page-header h2 { font-size: 22px; font-weight: 600; color: #1a237e; margin: 0; }
+.header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.form-card { border-radius: 10px; }
+.inline-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.inline-form mat-form-field { min-width: 180px; flex: 1; }
+.form-actions { display: flex; gap: 8px; align-items: center; padding-top: 4px; }
+.table-wrapper { overflow-x: auto; }
+.full-table { width: 100%; }
+.tab-content { padding: 16px 0; }
+.empty-msg { text-align: center; color: #999; padding: 24px; }
+.metrics-cell { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status-select { font-size: 12px; width: 140px; }
+mat-card-title { font-size: 16px; font-weight: 600; color: #333; padding: 16px 16px 0; }
+.status-badge { padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+.status-badge.pass, .status-badge.completed { background: #e8f5e9; color: #2e7d32; }
+.status-badge.fail, .status-badge.cancelled { background: #ffebee; color: #c62828; }
+.status-badge.pending, .status-badge.planned { background: #f3e5f5; color: #6a1b9a; }
+.status-badge.in_progress { background: #fff3e0; color: #e65100; }
+.scope-badge { padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+.scope-badge.incident { background: #ffebee; color: #c62828; }
+.scope-badge.traffic { background: #fff3e0; color: #e65100; }
+.scope-badge.transport { background: #e3f2fd; color: #1565c0; }
+.scope-badge.compliance { background: #f3e5f5; color: #6a1b9a; }

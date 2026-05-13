@@ -1,0 +1,77 @@
+<div class="auth-container">
+  <mat-card class="auth-card">
+    <div class="auth-header">
+      <mat-icon class="brand-icon">directions_bus</mat-icon>
+      <h1>Transpolink</h1>
+      <p>Transportation &amp; Traffic Management System</p>
+    </div>
+
+    <mat-card-content>
+      <h2 class="form-title">Sign In</h2>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email Address</mat-label>
+          <input matInput formControlName="email" type="email"
+                 autocomplete="email" placeholder="you@example.com" />
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="form.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="form.get('email')?.hasError('email')">Enter a valid email address</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'"
+                 formControlName="password" autocomplete="current-password" />
+          <button mat-icon-button matSuffix type="button"
+                  (click)="hidePassword = !hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="form.get('password')?.hasError('required')">Password is required</mat-error>
+        </mat-form-field>
+
+        <!-- Status-aware error banners -->
+        <div class="error-banner pending" *ngIf="errorType === 'pending'">
+          <mat-icon>hourglass_empty</mat-icon>
+          <div>
+            <strong>Account Pending Approval</strong>
+            <p>Your registration is under review. You will be notified once an admin approves your account.</p>
+          </div>
+        </div>
+
+        <div class="error-banner rejected" *ngIf="errorType === 'rejected'">
+          <mat-icon>cancel</mat-icon>
+          <div>
+            <strong>Account Rejected</strong>
+            <p>Your account request was not approved. Please contact the administrator.</p>
+          </div>
+        </div>
+
+        <div class="error-banner suspended" *ngIf="errorType === 'suspended'">
+          <mat-icon>block</mat-icon>
+          <div>
+            <strong>Account Suspended</strong>
+            <p>Your account has been suspended. Please contact the administrator.</p>
+          </div>
+        </div>
+
+        <div class="error-banner" *ngIf="errorType === 'invalid'">
+          <mat-icon>error_outline</mat-icon>
+          <span>Invalid email or password.</span>
+        </div>
+
+        <button mat-raised-button color="primary" type="submit"
+                class="full-width submit-btn"
+                [disabled]="loading || form.invalid">
+          <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+          <span *ngIf="!loading">Sign In</span>
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <span>New to Transpolink?</span>
+        <a routerLink="/register" class="link">Request Access</a>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

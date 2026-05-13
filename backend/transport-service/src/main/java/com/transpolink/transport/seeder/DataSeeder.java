@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -25,21 +26,30 @@ public class DataSeeder implements CommandLineRunner {
     private final TransportRouteRepository routeRepository;
     private final ScheduleRepository scheduleRepository;
     private final FleetRepository fleetRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void run(String... args) {
+        patchMissingRegistrationNumbers();
+
         if (routeRepository.count() > 0) {
             log.info("Transport seeder skipped — data already exists.");
             return;
         }
 
+        Long operatorId = getUserId("transport@transpolink.com");
+        if (operatorId == null) {
+            log.warn("Transport seeder skipped — transport user not found in identity DB.");
+            return;
+        }
+
         List<TransportRoute> routes = List.of(
-            TransportRoute.builder().operatorId(4L).type(RouteType.BUS).startPoint("Central Station").endPoint("Airport Terminal").status(RouteStatus.ACTIVE).build(),
-            TransportRoute.builder().operatorId(4L).type(RouteType.BUS).startPoint("North District").endPoint("City Center").status(RouteStatus.ACTIVE).build(),
-            TransportRoute.builder().operatorId(4L).type(RouteType.TRAIN).startPoint("Main Terminal").endPoint("South Suburb").status(RouteStatus.ACTIVE).build(),
-            TransportRoute.builder().operatorId(4L).type(RouteType.TRAIN).startPoint("East Station").endPoint("West Station").status(RouteStatus.INACTIVE).build(),
-            TransportRoute.builder().operatorId(4L).type(RouteType.BUS).startPoint("University Campus").endPoint("Shopping Mall").status(RouteStatus.ACTIVE).build(),
-            TransportRoute.builder().operatorId(4L).type(RouteType.BUS).startPoint("Industrial Zone").endPoint("Residential Area B").status(RouteStatus.SUSPENDED).build()
+            TransportRoute.builder().operatorId(operatorId).type(RouteType.BUS).startPoint("Central Station").endPoint("Airport Terminal").status(RouteStatus.ACTIVE).build(),
+            TransportRoute.builder().operatorId(operatorId).type(RouteType.BUS).startPoint("North District").endPoint("City Center").status(RouteStatus.ACTIVE).build(),
+            TransportRoute.builder().operatorId(operatorId).type(RouteType.TRAIN).startPoint("Main Terminal").endPoint("South Suburb").status(RouteStatus.ACTIVE).build(),
+            TransportRoute.builder().operatorId(operatorId).type(RouteType.TRAIN).startPoint("East Station").endPoint("West Station").status(RouteStatus.INACTIVE).build(),
+            TransportRoute.builder().operatorId(operatorId).type(RouteType.BUS).startPoint("University Campus").endPoint("Shopping Mall").status(RouteStatus.ACTIVE).build(),
+            TransportRoute.builder().operatorId(operatorId).type(RouteType.BUS).startPoint("Industrial Zone").endPoint("Residential Area B").status(RouteStatus.SUSPENDED).build()
         );
 
         List<TransportRoute> savedRoutes = routeRepository.saveAll(routes);
@@ -61,16 +71,50 @@ public class DataSeeder implements CommandLineRunner {
         log.info("Seeded {} schedules.", schedules.size());
 
         List<Fleet> fleets = List.of(
-            Fleet.builder().operatorId(4L).vehicleType("Standard Bus").capacity(50).status(FleetStatus.IN_SERVICE).build(),
-            Fleet.builder().operatorId(4L).vehicleType("Standard Bus").capacity(50).status(FleetStatus.AVAILABLE).build(),
-            Fleet.builder().operatorId(4L).vehicleType("Double Decker Bus").capacity(90).status(FleetStatus.IN_SERVICE).build(),
-            Fleet.builder().operatorId(4L).vehicleType("Mini Bus").capacity(25).status(FleetStatus.MAINTENANCE).build(),
-            Fleet.builder().operatorId(4L).vehicleType("Electric Train").capacity(300).status(FleetStatus.IN_SERVICE).build(),
-            Fleet.builder().operatorId(4L).vehicleType("Electric Train").capacity(300).status(FleetStatus.AVAILABLE).build(),
-            Fleet.builder().operatorId(4L).vehicleType("Standard Bus").capacity(50).status(FleetStatus.RETIRED).build()
+            Fleet.builder().registrationNumber("TN01AB1234").vehicleType("Standard Bus").capacity(50).status(FleetStatus.IN_SERVICE).build(),
+            Fleet.builder().registrationNumber("TN01AB1235").vehicleType("Standard Bus").capacity(50).status(FleetStatus.AVAILABLE).build(),
+            Fleet.builder().registrationNumber("TN01CD5678").vehicleType("Double Decker Bus").capacity(90).status(FleetStatus.IN_SERVICE).build(),
+            Fleet.builder().registrationNumber("TN02EF9012").vehicleType("Mini Bus").capacity(25).status(FleetStatus.AVAILABLE).build(),
+            Fleet.builder().registrationNumber("TN03GH3456").vehicleType("Electric Train").capacity(300).status(FleetStatus.IN_SERVICE).build(),
+            Fleet.builder().registrationNumber("TN03GH3457").vehicleType("Electric Train").capacity(300).status(FleetStatus.AVAILABLE).build(),
+            Fleet.builder().registrationNumber("TN04IJ7890").vehicleType("Standard Bus").capacity(50).status(FleetStatus.RETIRED).build()
         );
 
         fleetRepository.saveAll(fleets);
         log.info("Seeded {} fleet vehicles.", fleets.size());
+    }
+
+    private void patchMissingRegistrationNumbers() {
+        int updated = 0;
+        String[][] data = {
+            {"Standard Bus",      "TN01AB1234"},
+            {"Standard Bus",      "TN01AB1235"},
+            {"Double Decker Bus", "TN01CD5678"},
+            {"Mini Bus",          "TN02EF9012"},
+            {"Electric Train",    "TN03GH3456"},
+            {"Electric Train",    "TN03GH3457"},
+            {"Standard Bus",      "TN04IJ7890"}
+        };
+        for (String[] row : data) {
+            int rows = jdbcTemplate.update(
+                "UPDATE transpolink_transport.fleets SET registration_number = ? " +
+                "WHERE vehicle_type = ? AND registration_number IS NULL LIMIT 1",
+                row[1], row[0]
+            );
+            updated += rows;
+        }
+        if (updated > 0) log.info("Patched {} fleet rows with registration numbers.", updated);
+    }
+
+    private Long getUserId(String email) {
+        try {
+            return jdbcTemplate.queryForObject(
+                "SELECT user_id FROM transpolink_identity.users WHERE email = ?",
+                Long.class, email
+            );
+        } catch (Exception e) {
+            log.warn("User not found for email: {}", email);
+            return null;
+        }
     }
 }

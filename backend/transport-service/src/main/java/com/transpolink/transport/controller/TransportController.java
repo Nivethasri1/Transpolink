@@ -40,6 +40,12 @@ public class TransportController {
         return ResponseEntity.ok(transportService.createSchedule(request));
     }
 
+    @GetMapping("/api/schedules")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('COMPLIANCE_OFFICER') or hasRole('CITIZEN')")
+    public ResponseEntity<List<ScheduleResponse>> getAllSchedules() {
+        return ResponseEntity.ok(transportService.getAllSchedules());
+    }
+
     @GetMapping("/api/schedules/route/{routeId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('COMPLIANCE_OFFICER') or hasRole('CITIZEN')")
     public ResponseEntity<List<ScheduleResponse>> getSchedules(@PathVariable Long routeId) {
@@ -62,6 +68,30 @@ public class TransportController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('COMPLIANCE_OFFICER') or hasRole('CITIZEN')")
     public ResponseEntity<List<FleetResponse>> getFleet(@PathVariable Long operatorId) {
         return ResponseEntity.ok(transportService.getFleetByOperator(operatorId));
+    }
+
+    @GetMapping("/api/fleets")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('COMPLIANCE_OFFICER') or hasRole('CITIZEN')")
+    public ResponseEntity<List<FleetResponse>> getAllFleet() {
+        return ResponseEntity.ok(transportService.getAllFleet());
+    }
+
+    @GetMapping("/api/fleets/available")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRANSPORT_OPERATOR')")
+    public ResponseEntity<List<FleetResponse>> getAvailableFleet() {
+        return ResponseEntity.ok(transportService.getAvailableFleet());
+    }
+
+    @GetMapping("/api/fleets/available/by-type")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRANSPORT_OPERATOR')")
+    public ResponseEntity<List<FleetResponse>> getAvailableFleetByVehicleType(@RequestParam String vehicleType) {
+        return ResponseEntity.ok(transportService.getAvailableFleetByVehicleType(vehicleType));
+    }
+
+    @PatchMapping("/api/fleets/{fleetId}/assign/{routeId}")
+    @PreAuthorize("hasRole('TRANSPORT_OPERATOR') or hasRole('ADMIN')")
+    public ResponseEntity<FleetResponse> assignFleet(@PathVariable Long fleetId, @PathVariable Long routeId) {
+        return ResponseEntity.ok(transportService.assignFleetToRoute(fleetId, routeId));
     }
 
     @PatchMapping("/api/fleets/{id}/status")

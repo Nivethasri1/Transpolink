@@ -11,4 +11,5 @@ public interface IncidentService {
     IncidentResponse updateStatus(Long id, String status);
     ResolutionResponse addResolution(ResolutionRequest request);
     List<ResolutionResponse> getResolutionsByIncident(Long incidentId);
+    ResolutionResponse updateResolutionStatus(Long id, String status);
 }

@@ -20,8 +20,9 @@ public class User {
     @Column(nullable = false)
     private String name;
 
+    // Nullable — role is assigned by admin during approval
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Role role;
 
     @Column(nullable = false, unique = true)
@@ -32,7 +33,8 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    // Default PENDING — user cannot login until admin approves
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private UserStatus status = UserStatus.ACTIVE;
+    private UserStatus status = UserStatus.PENDING;
 }

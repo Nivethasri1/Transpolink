@@ -5,10 +5,15 @@ import com.transpolink.identity.dto.*;
 import java.util.List;
 
 public interface UserService {
-    AuthResponse register(RegisterRequest request);
+    RegisterResponse register(RegisterRequest request);
     AuthResponse login(LoginRequest request);
     UserResponse getUserById(Long id);
     List<UserResponse> getAllUsers();
-    UserResponse updateUser(Long id, RegisterRequest request);
+    List<UserResponse> getUsersByStatus(String status);
+    List<UserResponse> getUsersByRole(String role);
+    UserResponse approveUser(Long id, ApprovalRequest request);
+    UserResponse rejectUser(Long id);
+    UserResponse suspendUser(Long id);
+    UserResponse updateUser(Long id, ApprovalRequest request);
     void deleteUser(Long id);
 }

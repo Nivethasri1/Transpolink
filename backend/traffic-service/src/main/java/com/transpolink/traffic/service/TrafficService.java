@@ -11,4 +11,5 @@ public interface TrafficService {
     RoadSegmentResponse updateSegmentStatus(Long id, String status);
     TrafficFlowResponse recordFlow(TrafficFlowRequest request);
     List<TrafficFlowResponse> getFlowsBySegment(Long segmentId);
+    List<TrafficFlowResponse> getAllFlows();
 }

@@ -1,0 +1,170 @@
+<div class="page">
+  <div class="page-header">
+    <h2><mat-icon style="vertical-align:middle;margin-right:8px;font-size:24px;width:24px;height:24px;">admin_panel_settings</mat-icon>Admin Dashboard</h2>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <app-stat-card label="Pending Approval" [value]="pendingUsers.length" icon="pending_actions" color="#ff9800"></app-stat-card>
+    <app-stat-card label="Active Users" [value]="activeUsers.length" icon="people" color="#4caf50"></app-stat-card>
+    <app-stat-card label="Rejected" [value]="rejectedCount" icon="cancel" color="#f44336"></app-stat-card>
+    <app-stat-card label="Suspended" [value]="suspendedCount" icon="block" color="#9c27b0"></app-stat-card>
+  </div>
+
+  <mat-tab-group>
+
+    <!-- PENDING APPROVALS TAB -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">pending_actions</mat-icon>
+        Pending Approvals
+        <span class="badge" *ngIf="pendingUsers.length > 0">{{ pendingUsers.length }}</span>
+      </ng-template>
+
+      <div class="tab-content">
+        <div class="empty-state" *ngIf="pendingUsers.length === 0">
+          <mat-icon>check_circle</mat-icon>
+          <p>No pending approvals</p>
+        </div>
+
+        <div class="approval-cards" *ngIf="pendingUsers.length > 0">
+          <mat-card class="approval-card" *ngFor="let user of pendingUsers">
+            <div class="user-info">
+              <div class="avatar">{{ user.name.charAt(0).toUpperCase() }}</div>
+              <div class="user-details">
+                <strong>{{ user.name }}</strong>
+                <span>{{ user.email }}</span>
+                <span class="phone">{{ user.phone }}</span>
+              </div>
+              <span class="status-badge pending">PENDING</span>
+            </div>
+
+            <div class="approval-actions">
+              <div class="requested-role">
+                <mat-icon>badge</mat-icon>
+                <span>Requested as: <strong>{{ user.role }}</strong></span>
+              </div>
+
+              <button mat-raised-button
+                      style="background:#40513B;color:white;"
+                      (click)="approve(user)"
+                      matTooltip="Approve registration">
+                <mat-icon>check_circle</mat-icon> Approve
+              </button>
+
+              <button mat-stroked-button color="warn"
+                      (click)="reject(user)"
+                      matTooltip="Reject registration">
+                <mat-icon>cancel</mat-icon> Reject
+              </button>
+            </div>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- ALL USERS TAB -->
+    <mat-tab label="All Users">
+      <div class="tab-content">
+        <!-- Search + Filter -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <mat-icon>search</mat-icon>
+            <input [(ngModel)]="userSearch" placeholder="Search by name or email..." />
+            <button *ngIf="userSearch" (click)="userSearch=''"><mat-icon>close</mat-icon></button>
+          </div>
+          <div class="filter-chips">
+            <button class="fchip" [class.active]="userStatusFilter==='ALL'" (click)="userStatusFilter='ALL'">All <span>{{allUsers.length}}</span></button>
+            <button class="fchip open" [class.active]="userStatusFilter==='ACTIVE'" (click)="userStatusFilter='ACTIVE'">Active</button>
+            <button class="fchip maintenance" [class.active]="userStatusFilter==='PENDING'" (click)="userStatusFilter='PENDING'">Pending</button>
+            <button class="fchip congested" [class.active]="userStatusFilter==='SUSPENDED'" (click)="userStatusFilter='SUSPENDED'">Suspended</button>
+            <button class="fchip closed" [class.active]="userStatusFilter==='REJECTED'" (click)="userStatusFilter='REJECTED'">Rejected</button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="filteredUsers" class="full-table">
+            <ng-container matColumnDef="userId">
+              <th mat-header-cell *matHeaderCellDef>#</th>
+              <td mat-cell *matCellDef="let u">{{ u.userId }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let u">{{ u.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef>Email</th>
+              <td mat-cell *matCellDef="let u">{{ u.email }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="role">
+              <th mat-header-cell *matHeaderCellDef>Role</th>
+              <td mat-cell *matCellDef="let u">
+                <span class="role-badge" *ngIf="u.role">{{ u.role }}</span>
+                <span class="no-role" *ngIf="!u.role">—</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let u">
+                <span class="status-badge" [ngClass]="u.status.toLowerCase()">{{ u.status }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let u">
+                <mat-select placeholder="Change Role" class="inline-select"
+                            *ngIf="u.status === 'ACTIVE'"
+                            (selectionChange)="updateRole(u, $event.value)">
+                  <mat-option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</mat-option>
+                </mat-select>
+                <button mat-icon-button color="warn"
+                        *ngIf="u.status === 'ACTIVE'"
+                        (click)="suspend(u)" matTooltip="Suspend">
+                  <mat-icon>block</mat-icon>
+                </button>
+                <button mat-icon-button color="warn"
+                        (click)="deleteUser(u)" matTooltip="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="activeCols"></tr>
+            <tr mat-row *matRowDef="let row; columns: activeCols;"></tr>
+          </table>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- QUICK LINKS TAB -->
+    <mat-tab label="Modules">
+      <div class="tab-content">
+        <div class="quick-links">
+          <mat-card class="link-card" routerLink="/traffic">
+            <mat-icon>traffic</mat-icon><span>Traffic Monitoring</span>
+          </mat-card>
+          <mat-card class="link-card" routerLink="/fleet">
+            <mat-icon>directions_bus</mat-icon><span>Fleet Management</span>
+          </mat-card>
+          <mat-card class="link-card" routerLink="/compliance">
+            <mat-icon>fact_check</mat-icon><span>Compliance</span>
+          </mat-card>
+          <mat-card class="link-card" routerLink="/incidents">
+            <mat-icon>report_problem</mat-icon><span>Incidents</span>
+          </mat-card>
+          <mat-card class="link-card" routerLink="/notifications">
+            <mat-icon>notifications</mat-icon><span>Notifications</span>
+          </mat-card>
+          <mat-card class="link-card" routerLink="/reports">
+            <mat-icon>bar_chart</mat-icon><span>Reports</span>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>

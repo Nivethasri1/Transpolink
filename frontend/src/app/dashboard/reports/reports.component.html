@@ -1,0 +1,111 @@
+<div class="page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon"><mat-icon>bar_chart</mat-icon></div>
+      <div>
+        <h2>Reports</h2>
+        <p>Generate and download PDF reports from live database data</p>
+      </div>
+    </div>
+    <button class="action-btn" *ngIf="canGenerate" (click)="showForm=!showForm">
+      <mat-icon>{{ showForm ? 'close' : 'add_chart' }}</mat-icon>
+      {{ showForm ? 'Cancel' : 'Generate Report' }}
+    </button>
+  </div>
+
+  <!-- Stat Chips -->
+  <div class="stats-row">
+    <div class="stat-chip total">    <mat-icon>bar_chart</mat-icon>     Total {{ reports.length }}</div>
+    <div class="stat-chip incident"> <mat-icon>warning</mat-icon>        Incident {{ incidentCount }}</div>
+    <div class="stat-chip traffic">  <mat-icon>traffic</mat-icon>        Traffic {{ trafficCount }}</div>
+    <div class="stat-chip transport"><mat-icon>directions_bus</mat-icon> Transport {{ transportCount }}</div>
+    <div class="stat-chip compliance"><mat-icon>fact_check</mat-icon>    Compliance {{ complianceCount }}</div>
+  </div>
+
+  <!-- PDF Download Cards -->
+  <div class="pdf-section">
+    <div class="pdf-section-title"><mat-icon>picture_as_pdf</mat-icon> Download Live PDF Reports</div>
+    <div class="pdf-grid">
+
+      <div class="pdf-card" *ngFor="let s of scopes" [ngClass]="s.toLowerCase()" (click)="downloadPdf(s)">
+        <div class="pdf-icon">
+          <mat-icon>{{ s==='INCIDENT' ? 'warning' : s==='TRAFFIC' ? 'traffic' : s==='TRANSPORT' ? 'directions_bus' : 'fact_check' }}</mat-icon>
+        </div>
+        <div class="pdf-label">{{ s | titlecase }} Report</div>
+        <div class="pdf-desc">{{ scopeDesc(s) }}</div>
+        <mat-icon class="pdf-dl">download</mat-icon>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Generate Form -->
+  <div class="form-panel" *ngIf="showForm && canGenerate">
+    <div class="form-header"><mat-icon>add_chart</mat-icon><h3>Generate New Report Entry</h3></div>
+    <form [formGroup]="form" (ngSubmit)="generate()" class="form-body">
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Scope</mat-label>
+        <mat-select formControlName="scope">
+          <mat-option *ngFor="let s of scopes" [value]="s">{{ s }}</mat-option>
+        </mat-select>
+        <mat-icon matSuffix>category</mat-icon>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="field wide">
+        <mat-label>Metrics / Description</mat-label>
+        <textarea matInput formControlName="metrics" rows="2" placeholder="e.g. Total incidents Q1 2024, resolved: 45, pending: 12"></textarea>
+      </mat-form-field>
+      <div class="form-actions">
+        <button type="submit" class="save-btn" [disabled]="form.invalid"><mat-icon>save</mat-icon> Save</button>
+        <button type="button" class="cancel-btn" (click)="showForm=false">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Search + Filter -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input [(ngModel)]="reportSearch" placeholder="Search reports..." />
+      <button *ngIf="reportSearch" (click)="reportSearch=''"><mat-icon>close</mat-icon></button>
+    </div>
+    <div class="filter-chips">
+      <div class="chip"               [class.active]="selectedScope===null"         (click)="clearFilter()">All</div>
+      <div class="chip incident-chip" [class.active]="selectedScope==='INCIDENT'"   (click)="filterByScope('INCIDENT')">Incident</div>
+      <div class="chip traffic-chip"  [class.active]="selectedScope==='TRAFFIC'"    (click)="filterByScope('TRAFFIC')">Traffic</div>
+      <div class="chip transport-chip"[class.active]="selectedScope==='TRANSPORT'"  (click)="filterByScope('TRANSPORT')">Transport</div>
+      <div class="chip compliance-chip"[class.active]="selectedScope==='COMPLIANCE'"(click)="filterByScope('COMPLIANCE')">Compliance</div>
+    </div>
+  </div>
+
+  <!-- Reports List -->
+  <div class="section-card">
+    <div class="section-header">
+      <h3><mat-icon>list</mat-icon> {{ selectedScope ? selectedScope + ' Reports' : 'All Reports' }} ({{ filteredReports.length }})</h3>
+    </div>
+    <div class="report-list" *ngIf="filteredReports.length > 0">
+      <div class="report-row" *ngFor="let r of filteredReports">
+        <div class="scope-icon" [ngClass]="r.scope.toLowerCase()">
+          <mat-icon>{{ r.scope==='INCIDENT' ? 'warning' : r.scope==='TRAFFIC' ? 'traffic' : r.scope==='TRANSPORT' ? 'directions_bus' : 'fact_check' }}</mat-icon>
+        </div>
+        <div class="report-info">
+          <span class="report-title">Report #{{ r.reportId }} — {{ r.scope }}</span>
+          <div class="metrics-grid">
+            <div class="metric-item" *ngFor="let m of parseMetrics(r.metrics)">
+              <span class="metric-key">{{ m.key }}</span>
+              <span class="metric-val">{{ m.value }}</span>
+            </div>
+          </div>
+          <span class="report-meta"><mat-icon>calendar_today</mat-icon>{{ r.generatedDate | date:'mediumDate' }}</span>
+        </div>
+        <span class="scope-pill" [ngClass]="r.scope.toLowerCase()">{{ r.scope }}</span>
+      </div>
+    </div>
+    <div class="empty-state" *ngIf="filteredReports.length === 0">
+      <mat-icon>bar_chart</mat-icon>
+      <p>No reports found</p>
+    </div>
+  </div>
+
+</div>

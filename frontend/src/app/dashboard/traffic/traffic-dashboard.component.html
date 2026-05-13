@@ -1,0 +1,182 @@
+<div class="traffic-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon"><mat-icon>traffic</mat-icon></div>
+      <div>
+        <h2>Traffic Monitoring</h2>
+        <p>Monitor road segments and record traffic flows</p>
+      </div>
+    </div>
+    <div class="header-actions" *ngIf="isOfficer">
+      <button class="action-btn primary" (click)="showSegmentForm = !showSegmentForm">
+        <mat-icon>add_road</mat-icon> Add Segment
+      </button>
+      <button class="action-btn secondary" (click)="showFlowForm = !showFlowForm; loadSegments()">
+        <mat-icon>add_chart</mat-icon> Record Flow
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="mini-stats">
+    <div class="mini-stat total"><mat-icon>map</mat-icon><span>Total {{segments.length}}</span></div>
+    <div class="mini-stat open"><mat-icon>check_circle</mat-icon><span>Open {{openCount}}</span></div>
+    <div class="mini-stat congested"><mat-icon>warning</mat-icon><span>Congested {{congestedCount}}</span></div>
+    <div class="mini-stat closed"><mat-icon>construction</mat-icon><span>Closed/Maintenance {{closedCount}}</span></div>
+  </div>
+
+  <!-- Add Segment Form -->
+  <div class="form-panel" *ngIf="showSegmentForm && isOfficer">
+    <div class="form-panel-header">
+      <mat-icon>add_road</mat-icon>
+      <h3>New Road Segment</h3>
+      <button class="close-btn" (click)="showSegmentForm = false"><mat-icon>close</mat-icon></button>
+    </div>
+    <form [formGroup]="segmentForm" (ngSubmit)="addSegment()" class="panel-form">
+      <mat-form-field appearance="outline" class="panel-field" style="flex:2">
+        <mat-label>Location</mat-label>
+        <input matInput formControlName="location" placeholder="e.g. Main St - 5th Ave" />
+        <mat-icon matSuffix>location_on</mat-icon>
+        <mat-error *ngIf="segmentForm.get('location')?.hasError('required')">Required</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="panel-field">
+        <mat-label>Length (km)</mat-label>
+        <input matInput type="number" formControlName="length" />
+        <mat-error *ngIf="segmentForm.get('length')?.hasError('required')">Required</mat-error>
+      </mat-form-field>
+      <div class="panel-actions">
+        <button type="submit" class="submit-btn" [disabled]="segmentForm.invalid"><mat-icon>save</mat-icon> Save</button>
+        <button type="button" class="cancel-btn" (click)="showSegmentForm = false">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Record Flow Form -->
+  <div class="form-panel" *ngIf="showFlowForm && isOfficer">
+    <div class="form-panel-header accent">
+      <mat-icon>add_chart</mat-icon>
+      <h3>Record Traffic Flow</h3>
+      <button class="close-btn" (click)="showFlowForm = false"><mat-icon>close</mat-icon></button>
+    </div>
+    <form [formGroup]="flowForm" (ngSubmit)="recordFlow()" class="panel-form">
+      <mat-form-field appearance="outline" class="panel-field">
+        <mat-label>Road Segment</mat-label>
+        <mat-select formControlName="segmentId">
+          <mat-option *ngFor="let s of segments" [value]="s.segmentId">{{s.location}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="panel-field">
+        <mat-label>Volume (vehicles/hr)</mat-label>
+        <input matInput type="number" formControlName="volume" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="panel-field">
+        <mat-label>Speed (km/h)</mat-label>
+        <input matInput type="number" formControlName="speed" />
+      </mat-form-field>
+      <div class="panel-actions">
+        <button type="submit" class="submit-btn accent" [disabled]="flowForm.invalid"><mat-icon>save</mat-icon> Record</button>
+        <button type="button" class="cancel-btn" (click)="showFlowForm = false">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Road Segments -->
+  <div class="section-card">
+    <div class="section-header">
+      <h3><mat-icon>map</mat-icon> Road Segments</h3>
+    </div>
+    <div class="filter-bar">
+      <div class="search-box">
+        <mat-icon>search</mat-icon>
+        <input [(ngModel)]="segmentSearch" placeholder="Search by location..." />
+        <button *ngIf="segmentSearch" (click)="segmentSearch=''"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="filter-chips">
+        <button class="fchip" [class.active]="segmentStatusFilter==='ALL'" (click)="segmentStatusFilter='ALL'">All <span>{{segments.length}}</span></button>
+        <button class="fchip open" [class.active]="segmentStatusFilter==='OPEN'" (click)="segmentStatusFilter='OPEN'">Open <span>{{openCount}}</span></button>
+        <button class="fchip congested" [class.active]="segmentStatusFilter==='CONGESTED'" (click)="segmentStatusFilter='CONGESTED'">Congested <span>{{congestedCount}}</span></button>
+        <button class="fchip closed" [class.active]="segmentStatusFilter==='CLOSED'" (click)="segmentStatusFilter='CLOSED'">Closed</button>
+        <button class="fchip maintenance" [class.active]="segmentStatusFilter==='UNDER_MAINTENANCE'" (click)="segmentStatusFilter='UNDER_MAINTENANCE'">Maintenance</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="filteredSegments" class="full-table">
+        <ng-container matColumnDef="segmentId">
+          <th mat-header-cell *matHeaderCellDef>#</th>
+          <td mat-cell *matCellDef="let s">{{ s.segmentId }}</td>
+        </ng-container>
+        <ng-container matColumnDef="location">
+          <th mat-header-cell *matHeaderCellDef>Location</th>
+          <td mat-cell *matCellDef="let s"><strong>{{ s.location }}</strong></td>
+        </ng-container>
+        <ng-container matColumnDef="length">
+          <th mat-header-cell *matHeaderCellDef>Length (km)</th>
+          <td mat-cell *matCellDef="let s">{{ s.length }}</td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let s">
+            <span class="status-pill" [ngClass]="s.status.toLowerCase()">{{ s.status.replace('_',' ') }}</span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let s">
+            <button class="view-btn" (click)="loadFlows(s.segmentId)" matTooltip="View Flows">
+              <mat-icon>bar_chart</mat-icon> Flows
+            </button>
+            <mat-select *ngIf="isOfficer" placeholder="Update Status" class="status-select"
+              (selectionChange)="updateStatus(s.segmentId, $event.value)">
+              <mat-option *ngFor="let st of statusOptions" [value]="st">{{ st }}</mat-option>
+            </mat-select>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="segmentCols"></tr>
+        <tr mat-row *matRowDef="let row; columns: segmentCols;"></tr>
+      </table>
+      <p class="empty-msg" *ngIf="filteredSegments.length === 0">No road segments found.</p>
+    </div>
+  </div>
+
+  <!-- Traffic Flows -->
+  <div class="section-card" *ngIf="flows.length > 0">
+    <div class="section-header">
+      <h3><mat-icon>show_chart</mat-icon> Traffic Flows {{ selectedSegmentId ? '— Segment #' + selectedSegmentId : '' }}</h3>
+    </div>
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="flows" class="full-table">
+        <ng-container matColumnDef="flowId">
+          <th mat-header-cell *matHeaderCellDef>#</th>
+          <td mat-cell *matCellDef="let f">{{ f.flowId }}</td>
+        </ng-container>
+        <ng-container matColumnDef="segmentId">
+          <th mat-header-cell *matHeaderCellDef>Segment</th>
+          <td mat-cell *matCellDef="let f">{{ f.segmentId }}</td>
+        </ng-container>
+        <ng-container matColumnDef="volume">
+          <th mat-header-cell *matHeaderCellDef>Volume</th>
+          <td mat-cell *matCellDef="let f">{{ f.volume }} veh/hr</td>
+        </ng-container>
+        <ng-container matColumnDef="speed">
+          <th mat-header-cell *matHeaderCellDef>Speed</th>
+          <td mat-cell *matCellDef="let f">{{ f.speed }} km/h</td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let f">
+            <span class="status-pill" [ngClass]="f.status.toLowerCase()">{{ f.status }}</span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Recorded</th>
+          <td mat-cell *matCellDef="let f">{{ f.date | date:'MMM d, h:mm a' }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="flowCols"></tr>
+        <tr mat-row *matRowDef="let row; columns: flowCols;"></tr>
+      </table>
+    </div>
+  </div>
+
+</div>

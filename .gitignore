@@ -19,6 +19,11 @@ out/
 # VS Code
 .vscode/
 
+# Node / Angular
+node_modules/
+frontend/dist/
+frontend/.angular/
+
 # Logs
 *.log
 

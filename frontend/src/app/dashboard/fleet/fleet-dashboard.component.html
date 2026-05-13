@@ -1,0 +1,169 @@
+<div class="page">
+  <div class="page-header">
+    <h2>Fleet Management</h2>
+    <div class="header-actions" *ngIf="isOperator">
+      <button mat-raised-button color="primary" (click)="showRouteForm = !showRouteForm"><mat-icon>add</mat-icon> Add Route</button>
+      <button mat-raised-button color="accent" (click)="showFleetForm = !showFleetForm"><mat-icon>directions_bus</mat-icon> Add Fleet</button>
+      <button mat-raised-button (click)="showScheduleForm = !showScheduleForm"><mat-icon>schedule</mat-icon> Add Schedule</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <app-stat-card label="Total Routes" [value]="routes.length" icon="route" color="#3f51b5"></app-stat-card>
+    <app-stat-card label="Active Routes" [value]="activeRoutes" icon="check_circle" color="#4caf50"></app-stat-card>
+    <app-stat-card label="Fleet Vehicles" [value]="fleets.length" icon="directions_bus" color="#ff9800"></app-stat-card>
+    <app-stat-card label="Available Fleet" [value]="availableFleet" icon="local_parking" color="#9c27b0"></app-stat-card>
+  </div>
+
+  <!-- Add Route Form -->
+  <mat-card class="form-card" *ngIf="showRouteForm && isOperator">
+    <mat-card-title>New Route</mat-card-title>
+    <mat-card-content>
+      <form [formGroup]="routeForm" (ngSubmit)="addRoute()" class="inline-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Type</mat-label>
+          <mat-select formControlName="type">
+            <mat-option *ngFor="let t of routeTypes" [value]="t">{{ t }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Start Point</mat-label>
+          <input matInput formControlName="startPoint" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>End Point</mat-label>
+          <input matInput formControlName="endPoint" />
+        </mat-form-field>
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit" [disabled]="routeForm.invalid">Save</button>
+          <button mat-button type="button" (click)="showRouteForm = false">Cancel</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Add Fleet Form -->
+  <mat-card class="form-card" *ngIf="showFleetForm && isOperator">
+    <mat-card-title>Add Fleet Vehicle</mat-card-title>
+    <mat-card-content>
+      <form [formGroup]="fleetForm" (ngSubmit)="addFleet()" class="inline-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Registration Number</mat-label>
+          <input matInput formControlName="registrationNumber" placeholder="e.g. TN05KL2345" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Vehicle Type</mat-label>
+          <input matInput formControlName="vehicleType" placeholder="e.g. Standard Bus" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Capacity</mat-label>
+          <input matInput type="number" formControlName="capacity" />
+        </mat-form-field>
+        <div class="form-actions">
+          <button mat-raised-button color="accent" type="submit" [disabled]="fleetForm.invalid">Save</button>
+          <button mat-button type="button" (click)="showFleetForm = false">Cancel</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Add Schedule Form -->
+  <mat-card class="form-card" *ngIf="showScheduleForm && isOperator">
+    <mat-card-title>Create Schedule</mat-card-title>
+    <mat-card-content>
+      <form [formGroup]="scheduleForm" (ngSubmit)="addSchedule()" class="inline-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Route</mat-label>
+          <mat-select formControlName="routeId">
+            <mat-option *ngFor="let r of routes" [value]="r.routeId">{{ r.routeId }} — {{ r.startPoint }} → {{ r.endPoint }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Departure Time</mat-label>
+          <input matInput type="datetime-local" formControlName="departureTime" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Arrival Time</mat-label>
+          <input matInput type="datetime-local" formControlName="arrivalTime" />
+        </mat-form-field>
+        <div class="form-actions">
+          <button mat-raised-button type="submit" [disabled]="scheduleForm.invalid">Save</button>
+          <button mat-button type="button" (click)="showScheduleForm = false">Cancel</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-tab-group>
+    <!-- Routes Tab -->
+    <mat-tab label="Routes">
+      <div class="tab-content">
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="routes" class="full-table">
+            <ng-container matColumnDef="routeId"><th mat-header-cell *matHeaderCellDef>#</th><td mat-cell *matCellDef="let r">{{ r.routeId }}</td></ng-container>
+            <ng-container matColumnDef="type"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let r">{{ r.type }}</td></ng-container>
+            <ng-container matColumnDef="startPoint"><th mat-header-cell *matHeaderCellDef>From</th><td mat-cell *matCellDef="let r">{{ r.startPoint }}</td></ng-container>
+            <ng-container matColumnDef="endPoint"><th mat-header-cell *matHeaderCellDef>To</th><td mat-cell *matCellDef="let r">{{ r.endPoint }}</td></ng-container>
+            <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let r"><span class="status-badge" [ngClass]="r.status.toLowerCase()">{{ r.status }}</span></td></ng-container>
+            <ng-container matColumnDef="actions"><th mat-header-cell *matHeaderCellDef>Schedules</th><td mat-cell *matCellDef="let r"><button mat-icon-button color="primary" (click)="loadSchedules(r.routeId)"><mat-icon>schedule</mat-icon></button></td></ng-container>
+            <tr mat-header-row *matHeaderRowDef="routeCols"></tr>
+            <tr mat-row *matRowDef="let row; columns: routeCols;"></tr>
+          </table>
+          <p class="empty-msg" *ngIf="routes.length === 0">No routes found.</p>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Fleet Tab -->
+    <mat-tab label="Fleet">
+      <div class="tab-content">
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="fleets" class="full-table">
+            <ng-container matColumnDef="fleetId"><th mat-header-cell *matHeaderCellDef>#</th><td mat-cell *matCellDef="let f">{{ f.fleetId }}</td></ng-container>
+            <ng-container matColumnDef="registrationNumber"><th mat-header-cell *matHeaderCellDef>Reg. Number</th><td mat-cell *matCellDef="let f">{{ f.registrationNumber }}</td></ng-container>
+            <ng-container matColumnDef="vehicleType"><th mat-header-cell *matHeaderCellDef>Vehicle Type</th><td mat-cell *matCellDef="let f">{{ f.vehicleType }}</td></ng-container>
+            <ng-container matColumnDef="capacity"><th mat-header-cell *matHeaderCellDef>Capacity</th><td mat-cell *matCellDef="let f">{{ f.capacity }}</td></ng-container>
+            <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let f"><span class="status-badge" [ngClass]="f.status.toLowerCase()">{{ f.status }}</span></td></ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Update Status</th>
+              <td mat-cell *matCellDef="let f">
+                <mat-select *ngIf="isOperator" placeholder="Change" class="status-select" (selectionChange)="updateFleetStatus(f.fleetId, $event.value)">
+                  <mat-option *ngFor="let s of fleetStatuses" [value]="s">{{ s }}</mat-option>
+                </mat-select>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="fleetCols"></tr>
+            <tr mat-row *matRowDef="let row; columns: fleetCols;"></tr>
+          </table>
+          <p class="empty-msg" *ngIf="fleets.length === 0">No fleet vehicles found.</p>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Schedules Tab -->
+    <mat-tab label="Schedules">
+      <div class="tab-content">
+        <p class="hint" *ngIf="schedules.length === 0">Click the schedule icon on a route to view its schedules.</p>
+        <div class="table-wrapper" *ngIf="schedules.length > 0">
+          <table mat-table [dataSource]="schedules" class="full-table">
+            <ng-container matColumnDef="scheduleId"><th mat-header-cell *matHeaderCellDef>#</th><td mat-cell *matCellDef="let s">{{ s.scheduleId }}</td></ng-container>
+            <ng-container matColumnDef="routeId"><th mat-header-cell *matHeaderCellDef>Route</th><td mat-cell *matCellDef="let s">{{ s.routeId }}</td></ng-container>
+            <ng-container matColumnDef="departureTime"><th mat-header-cell *matHeaderCellDef>Departure</th><td mat-cell *matCellDef="let s">{{ s.departureTime | date:'short' }}</td></ng-container>
+            <ng-container matColumnDef="arrivalTime"><th mat-header-cell *matHeaderCellDef>Arrival</th><td mat-cell *matCellDef="let s">{{ s.arrivalTime | date:'short' }}</td></ng-container>
+            <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let s"><span class="status-badge" [ngClass]="s.status.toLowerCase()">{{ s.status }}</span></td></ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Update</th>
+              <td mat-cell *matCellDef="let s">
+                <mat-select *ngIf="isOperator" placeholder="Change" class="status-select" (selectionChange)="updateScheduleStatus(s.scheduleId, $event.value)">
+                  <mat-option *ngFor="let st of scheduleStatuses" [value]="st">{{ st }}</mat-option>
+                </mat-select>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="scheduleCols"></tr>
+            <tr mat-row *matRowDef="let row; columns: scheduleCols;"></tr>
+          </table>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

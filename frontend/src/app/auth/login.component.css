@@ -1,0 +1,95 @@
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 40%, #40916c 100%);
+  padding: 16px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 16px;
+  box-shadow: 0 32px 64px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+.auth-header {
+  background: linear-gradient(135deg, #1b4332, #2d6a4f);
+  padding: 32px 24px;
+  text-align: center;
+  color: white;
+}
+
+.brand-icon { font-size: 52px; width: 52px; height: 52px; color: #95d5b2; }
+.auth-header h1 { margin: 8px 0 4px; font-size: 26px; font-weight: 700; letter-spacing: 1px; }
+.auth-header p { margin: 0; font-size: 12px; opacity: 0.8; }
+
+mat-card-content { padding: 28px 28px 24px !important; }
+
+.form-title { font-size: 18px; font-weight: 600; color: #1b4332; margin: 0 0 20px; }
+.full-width { width: 100%; margin-bottom: 4px; }
+
+.submit-btn {
+  width: 100%; height: 48px; font-size: 15px; font-weight: 600;
+  margin-top: 8px; display: flex; align-items: center; justify-content: center;
+  gap: 8px; border-radius: 8px;
+  background: linear-gradient(135deg, #2d6a4f, #40916c) !important;
+  color: white !important;
+}
+
+.submit-btn:hover:not([disabled]) {
+  background: linear-gradient(135deg, #1b4332, #2d6a4f) !important;
+}
+
+/* Error banners */
+.error-banner {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-radius: 8px; font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.error-banner mat-icon { flex-shrink: 0; margin-top: 1px; }
+.error-banner strong { display: block; margin-bottom: 2px; }
+.error-banner p { margin: 0; opacity: 0.85; }
+
+/* Default (invalid credentials) */
+.error-banner:not(.pending):not(.rejected):not(.suspended) {
+  background: #ffebee; color: #c62828; border-left: 3px solid #f44336;
+  align-items: center;
+}
+
+/* Pending */
+.error-banner.pending {
+  background: #fff8e1; color: #e65100; border-left: 3px solid #ff9800;
+}
+
+/* Rejected */
+.error-banner.rejected {
+  background: #ffebee; color: #b71c1c; border-left: 3px solid #f44336;
+}
+
+/* Suspended */
+.error-banner.suspended {
+  background: #fce4ec; color: #880e4f; border-left: 3px solid #e91e63;
+}
+
+.auth-footer {
+  text-align: center; margin-top: 20px; font-size: 14px; color: #666;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+
+.link { color: #2d6a4f; font-weight: 600; text-decoration: none; }
+.link:hover { text-decoration: underline; color: #1b4332; }
+
+/* Green outline fields */
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #2d6a4f !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: #2d6a4f !important;
+}

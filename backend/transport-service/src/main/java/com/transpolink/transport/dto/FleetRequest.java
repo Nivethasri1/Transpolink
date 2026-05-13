@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class FleetRequest {
-    @NotNull private Long operatorId;
+    @NotBlank private String registrationNumber;
     @NotBlank private String vehicleType;
-    @NotNull private Integer capacity;
+    @NotNull  private Integer capacity;
 }

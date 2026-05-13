@@ -12,7 +12,7 @@ public class Fleet {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fleetId;
 
-    private Long operatorId;
+    private String registrationNumber;
     private String vehicleType;
     private Integer capacity;
 

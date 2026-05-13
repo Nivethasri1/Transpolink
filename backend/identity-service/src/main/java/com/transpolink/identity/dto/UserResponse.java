@@ -10,7 +10,7 @@ import lombok.Data;
 public class UserResponse {
     private Long userId;
     private String name;
-    private Role role;
+    private Role role;       // null until admin approves
     private String email;
     private String phone;
     private UserStatus status;

@@ -1,5 +1,6 @@
 package com.transpolink.compliance.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.transpolink.compliance.enums.AuditStatus;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ public class AuditResponse {
     private Long officerId;
     private String scope;
     private String findings;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
     private AuditStatus status;
 }

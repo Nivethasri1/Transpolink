@@ -1,0 +1,35 @@
+<div class="sidebar">
+  <div class="sidebar-header">
+    <mat-icon class="brand-icon">directions_bus</mat-icon>
+    <div class="brand-text">
+      <span class="brand-name">Transpolink</span>
+      <span class="brand-sub">Management System</span>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="user-info">
+    <div class="avatar-circle">{{ userName ? userName.charAt(0).toUpperCase() : 'U' }}</div>
+    <div>
+      <div class="user-name">{{ userName || 'User' }}</div>
+      <div class="user-role">{{ role }}</div>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <mat-nav-list class="nav-list">
+    <a mat-list-item
+       *ngFor="let item of navItems"
+       [routerLink]="item.route"
+       routerLinkActive="active-link"
+       [routerLinkActiveOptions]="{exact: false}"
+       (click)="closeSidenav.emit()">
+      <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+      <span matListItemTitle>{{ item.label }}</span>
+    </a>
+  </mat-nav-list>
+
+  <div class="sidebar-footer"></div>
+</div>

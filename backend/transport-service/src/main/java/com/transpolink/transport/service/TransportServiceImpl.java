@@ -56,6 +56,11 @@ public class TransportServiceImpl implements TransportService {
     }
 
     @Override
+    public List<ScheduleResponse> getAllSchedules() {
+        return scheduleRepository.findAll().stream().map(this::mapSchedule).collect(Collectors.toList());
+    }
+
+    @Override
     public ScheduleResponse updateScheduleStatus(Long id, String status) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule not found: " + id));
@@ -66,7 +71,7 @@ public class TransportServiceImpl implements TransportService {
     @Override
     public FleetResponse addFleet(FleetRequest request) {
         Fleet fleet = Fleet.builder()
-                .operatorId(request.getOperatorId())
+                .registrationNumber(request.getRegistrationNumber())
                 .vehicleType(request.getVehicleType())
                 .capacity(request.getCapacity()).build();
         return mapFleet(fleetRepository.save(fleet));
@@ -74,7 +79,24 @@ public class TransportServiceImpl implements TransportService {
 
     @Override
     public List<FleetResponse> getFleetByOperator(Long operatorId) {
-        return fleetRepository.findByOperatorId(operatorId).stream().map(this::mapFleet).collect(Collectors.toList());
+        return fleetRepository.findAll().stream().map(this::mapFleet).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FleetResponse> getAllFleet() {
+        return fleetRepository.findAll().stream().map(this::mapFleet).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FleetResponse> getAvailableFleet() {
+        return fleetRepository.findByStatus(FleetStatus.AVAILABLE)
+                .stream().map(this::mapFleet).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FleetResponse> getAvailableFleetByVehicleType(String vehicleType) {
+        return fleetRepository.findByStatusAndVehicleType(FleetStatus.AVAILABLE, vehicleType)
+                .stream().map(this::mapFleet).collect(Collectors.toList());
     }
 
     @Override
@@ -82,6 +104,14 @@ public class TransportServiceImpl implements TransportService {
         Fleet fleet = fleetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Fleet not found: " + id));
         fleet.setStatus(FleetStatus.valueOf(status));
+        return mapFleet(fleetRepository.save(fleet));
+    }
+
+    @Override
+    public FleetResponse assignFleetToRoute(Long fleetId, Long routeId) {
+        Fleet fleet = fleetRepository.findById(fleetId)
+                .orElseThrow(() -> new ResourceNotFoundException("Fleet not found: " + fleetId));
+        fleet.setStatus(FleetStatus.IN_SERVICE);
         return mapFleet(fleetRepository.save(fleet));
     }
 
@@ -96,7 +126,9 @@ public class TransportServiceImpl implements TransportService {
     }
 
     private FleetResponse mapFleet(Fleet f) {
-        return FleetResponse.builder().fleetId(f.getFleetId()).operatorId(f.getOperatorId())
-                .vehicleType(f.getVehicleType()).capacity(f.getCapacity()).status(f.getStatus()).build();
+        return FleetResponse.builder().fleetId(f.getFleetId())
+                .registrationNumber(f.getRegistrationNumber())
+                .vehicleType(f.getVehicleType()).capacity(f.getCapacity())
+                .status(f.getStatus()).build();
     }
 }

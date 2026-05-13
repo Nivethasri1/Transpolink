@@ -35,39 +35,52 @@ public class DataSeeder implements CommandLineRunner {
 
         List<User> users = List.of(
             User.builder()
-                .name("Alice Admin").role(Role.ADMIN)
+                .name("Admin User").role(Role.ADMIN)
                 .email("admin@transpolink.com").phone("1000000001")
-                .password(passwordEncoder.encode("Admin@123")).status(UserStatus.ACTIVE).build(),
+                .password(passwordEncoder.encode("Admin@123"))
+                .status(UserStatus.ACTIVE).build(),
 
             User.builder()
                 .name("Bob Citizen").role(Role.CITIZEN)
                 .email("citizen@transpolink.com").phone("1000000002")
-                .password(passwordEncoder.encode("Citizen@123")).status(UserStatus.ACTIVE).build(),
+                .password(passwordEncoder.encode("Citizen@123"))
+                .status(UserStatus.ACTIVE).build(),
 
             User.builder()
                 .name("Carol Officer").role(Role.TRAFFIC_OFFICER)
                 .email("officer@transpolink.com").phone("1000000003")
-                .password(passwordEncoder.encode("Officer@123")).status(UserStatus.ACTIVE).build(),
+                .password(passwordEncoder.encode("Officer@123"))
+                .status(UserStatus.ACTIVE).build(),
 
             User.builder()
-                .name("Dave Operator").role(Role.TRANSPORT_OPERATOR)
-                .email("operator@transpolink.com").phone("1000000004")
-                .password(passwordEncoder.encode("Operator@123")).status(UserStatus.ACTIVE).build(),
+                .name("Dave Transport").role(Role.TRANSPORT_OPERATOR)
+                .email("transport@transpolink.com").phone("1000000004")
+                .password(passwordEncoder.encode("Transport@123"))
+                .status(UserStatus.ACTIVE).build(),
 
             User.builder()
                 .name("Eve Compliance").role(Role.COMPLIANCE_OFFICER)
                 .email("compliance@transpolink.com").phone("1000000005")
-                .password(passwordEncoder.encode("Compliance@123")).status(UserStatus.ACTIVE).build(),
+                .password(passwordEncoder.encode("Compliance@123"))
+                .status(UserStatus.ACTIVE).build(),
 
             User.builder()
-                .name("Frank Citizen").role(Role.CITIZEN)
+                .name("Frank Pending").role(Role.TRAFFIC_OFFICER)
                 .email("frank@transpolink.com").phone("1000000006")
-                .password(passwordEncoder.encode("Frank@123")).status(UserStatus.ACTIVE).build(),
+                .password(passwordEncoder.encode("Frank@123"))
+                .status(UserStatus.PENDING).build(),
 
             User.builder()
-                .name("Grace Officer").role(Role.TRAFFIC_OFFICER)
+                .name("Grace Pending").role(Role.TRANSPORT_OPERATOR)
                 .email("grace@transpolink.com").phone("1000000007")
-                .password(passwordEncoder.encode("Grace@123")).status(UserStatus.INACTIVE).build()
+                .password(passwordEncoder.encode("Grace@123"))
+                .status(UserStatus.PENDING).build(),
+
+            User.builder()
+                .name("Henry Rejected").role(Role.COMPLIANCE_OFFICER)
+                .email("henry@transpolink.com").phone("1000000008")
+                .password(passwordEncoder.encode("Henry@123"))
+                .status(UserStatus.REJECTED).build()
         );
 
         List<User> saved = userRepository.saveAll(users);
@@ -76,11 +89,8 @@ public class DataSeeder implements CommandLineRunner {
         List<AuditLog> logs = List.of(
             AuditLog.builder().userId(saved.get(0).getUserId()).action("REGISTER").resource("User").timestamp(LocalDateTime.now()).build(),
             AuditLog.builder().userId(saved.get(1).getUserId()).action("REGISTER").resource("User").timestamp(LocalDateTime.now()).build(),
-            AuditLog.builder().userId(saved.get(2).getUserId()).action("REGISTER").resource("User").timestamp(LocalDateTime.now()).build(),
-            AuditLog.builder().userId(saved.get(0).getUserId()).action("LOGIN").resource("User").timestamp(LocalDateTime.now()).build(),
-            AuditLog.builder().userId(saved.get(1).getUserId()).action("LOGIN").resource("User").timestamp(LocalDateTime.now()).build()
+            AuditLog.builder().userId(saved.get(2).getUserId()).action("REGISTER").resource("User").timestamp(LocalDateTime.now()).build()
         );
-
         auditLogRepository.saveAll(logs);
         log.info("Seeded {} audit logs.", logs.size());
     }

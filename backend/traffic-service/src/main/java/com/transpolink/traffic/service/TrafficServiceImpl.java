@@ -68,6 +68,11 @@ public class TrafficServiceImpl implements TrafficService {
         return flowRepository.findBySegmentId(segmentId).stream().map(this::mapFlow).collect(Collectors.toList());
     }
 
+    @Override
+    public List<TrafficFlowResponse> getAllFlows() {
+        return flowRepository.findAll().stream().map(this::mapFlow).collect(Collectors.toList());
+    }
+
     private RoadSegmentResponse mapSegment(RoadSegment s) {
         return RoadSegmentResponse.builder()
                 .segmentId(s.getSegmentId()).location(s.getLocation())

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -24,11 +25,18 @@ public class DataSeeder implements CommandLineRunner {
 
     private final ComplianceRecordRepository recordRepository;
     private final AuditRepository auditRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void run(String... args) {
         if (recordRepository.count() > 0) {
             log.info("Compliance seeder skipped — data already exists.");
+            return;
+        }
+
+        Long officerId = getUserId("compliance@transpolink.com");
+        if (officerId == null) {
+            log.warn("Compliance seeder skipped — compliance user not found in identity DB.");
             return;
         }
 
@@ -46,14 +54,26 @@ public class DataSeeder implements CommandLineRunner {
         log.info("Seeded {} compliance records.", records.size());
 
         List<Audit> audits = List.of(
-            Audit.builder().officerId(5L).scope("Transport Route Compliance Q1").findings("3 routes found non-compliant with schedule policy.").date(LocalDate.now().minusDays(10)).status(AuditStatus.COMPLETED).build(),
-            Audit.builder().officerId(5L).scope("Incident Response Time Audit").findings("Average response time: 1.8 hours. 2 incidents exceeded threshold.").date(LocalDate.now().minusDays(5)).status(AuditStatus.COMPLETED).build(),
-            Audit.builder().officerId(5L).scope("Fleet Safety Inspection Q2").findings("Pending inspection of 4 vehicles.").date(LocalDate.now().minusDays(2)).status(AuditStatus.IN_PROGRESS).build(),
-            Audit.builder().officerId(5L).scope("Driver Licensing Compliance").findings(null).date(LocalDate.now().plusDays(3)).status(AuditStatus.PLANNED).build(),
-            Audit.builder().officerId(5L).scope("Road Maintenance Policy Audit").findings("All segments comply with maintenance schedule.").date(LocalDate.now().minusDays(15)).status(AuditStatus.COMPLETED).build()
+            Audit.builder().officerId(officerId).scope("Transport Route Compliance Q1").findings("3 routes found non-compliant with schedule policy.").date(LocalDate.now().minusDays(10)).status(AuditStatus.COMPLETED).build(),
+            Audit.builder().officerId(officerId).scope("Incident Response Time Audit").findings("Average response time: 1.8 hours. 2 incidents exceeded threshold.").date(LocalDate.now().minusDays(5)).status(AuditStatus.COMPLETED).build(),
+            Audit.builder().officerId(officerId).scope("Fleet Safety Inspection Q2").findings("Pending inspection of 4 vehicles.").date(LocalDate.now().minusDays(2)).status(AuditStatus.IN_PROGRESS).build(),
+            Audit.builder().officerId(officerId).scope("Driver Licensing Compliance").findings(null).date(LocalDate.now().plusDays(3)).status(AuditStatus.PLANNED).build(),
+            Audit.builder().officerId(officerId).scope("Road Maintenance Policy Audit").findings("All segments comply with maintenance schedule.").date(LocalDate.now().minusDays(15)).status(AuditStatus.COMPLETED).build()
         );
 
         auditRepository.saveAll(audits);
         log.info("Seeded {} audits.", audits.size());
+    }
+
+    private Long getUserId(String email) {
+        try {
+            return jdbcTemplate.queryForObject(
+                "SELECT user_id FROM transpolink_identity.users WHERE email = ?",
+                Long.class, email
+            );
+        } catch (Exception e) {
+            log.warn("User not found for email: {}", email);
+            return null;
+        }
     }
 }

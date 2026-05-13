@@ -1,0 +1,42 @@
+<mat-toolbar class="navbar">
+  <button mat-icon-button class="menu-btn" (click)="toggleSidenav.emit()">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <div class="brand">
+    <mat-icon class="brand-icon">directions_bus</mat-icon>
+    <span class="brand-name">Transpolink</span>
+  </div>
+
+  <span class="spacer"></span>
+
+  <a routerLink="/notifications" class="notif-btn" matTooltip="Notifications">
+    <mat-icon [matBadge]="unreadCount > 0 ? unreadCount : null"
+              matBadgeColor="warn"
+              matBadgeSize="small">notifications</mat-icon>
+  </a>
+
+  <button class="user-chip" [matMenuTriggerFor]="userMenu">
+    <div class="user-avatar">{{ userName ? userName.charAt(0).toUpperCase() : 'U' }}</div>
+    <div class="user-info">
+      <span class="user-name">{{ userName || 'User' }}</span>
+      <span class="user-role">{{ roleLabel }}</span>
+    </div>
+    <mat-icon class="chevron">expand_more</mat-icon>
+  </button>
+
+  <mat-menu #userMenu="matMenu" class="user-dropdown">
+    <div class="menu-profile">
+      <div class="menu-avatar">{{ userName ? userName.charAt(0).toUpperCase() : 'U' }}</div>
+      <div>
+        <div class="menu-name">{{ userName || 'User' }}</div>
+        <div class="menu-role">{{ roleLabel }}</div>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()" class="logout-item">
+      <mat-icon>logout</mat-icon>
+      <span>Sign Out</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>

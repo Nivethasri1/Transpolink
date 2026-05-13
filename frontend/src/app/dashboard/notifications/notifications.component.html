@@ -1,0 +1,111 @@
+<div class="notif-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon"><mat-icon>notifications</mat-icon></div>
+      <div>
+        <h2>Notifications</h2>
+        <p>Stay updated with your latest alerts and messages</p>
+      </div>
+    </div>
+    <button class="action-btn" *ngIf="canSend" (click)="showForm = !showForm">
+      <mat-icon>send</mat-icon> Send Notification
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="mini-stats">
+    <div class="mini-stat total"><mat-icon>notifications</mat-icon><span>Total {{filteredNotifications.length}}</span></div>
+    <div class="mini-stat unread"><mat-icon>mark_email_unread</mat-icon><span>Unread {{unreadCount}}</span></div>
+    <div class="mini-stat read"><mat-icon>mark_email_read</mat-icon><span>Read {{readCount}}</span></div>
+  </div>
+
+  <!-- Send Form -->
+  <div class="form-panel" *ngIf="showForm && canSend">
+    <div class="form-panel-header">
+      <mat-icon>send</mat-icon>
+      <h3>Send Notification</h3>
+      <button class="close-btn" (click)="showForm = false"><mat-icon>close</mat-icon></button>
+    </div>
+    <form [formGroup]="sendForm" (ngSubmit)="send()" class="panel-form">
+      <mat-form-field appearance="outline" class="panel-field">
+        <mat-label>Send To</mat-label>
+        <mat-select formControlName="targetRole">
+          <mat-option *ngFor="let r of targetRoles" [value]="r.value">{{ r.label }}</mat-option>
+        </mat-select>
+        <mat-icon matSuffix>group</mat-icon>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="panel-field">
+        <mat-label>Category</mat-label>
+        <mat-select formControlName="category">
+          <mat-option value="INCIDENT">Incident</mat-option>
+          <mat-option value="TRANSPORT">Transport</mat-option>
+          <mat-option value="COMPLIANCE">Compliance</mat-option>
+        </mat-select>
+        <mat-icon matSuffix>category</mat-icon>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="panel-field" style="flex:2">
+        <mat-label>Message</mat-label>
+        <textarea matInput formControlName="message" rows="2" placeholder="Enter your message..."></textarea>
+      </mat-form-field>
+      <div class="panel-actions">
+        <button type="submit" class="submit-btn" [disabled]="sendForm.invalid"><mat-icon>send</mat-icon> Send</button>
+        <button type="button" class="cancel-btn" (click)="showForm = false">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Notifications section -->
+  <div class="section-card">
+    <div class="section-header">
+      <h3><mat-icon>inbox</mat-icon> My Notifications</h3>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="search-box">
+        <mat-icon>search</mat-icon>
+        <input [(ngModel)]="notifSearch" placeholder="Search messages..." />
+        <button *ngIf="notifSearch" (click)="notifSearch=''"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="filter-chips">
+        <button class="fchip" [class.active]="notifStatusFilter==='ALL'" (click)="notifStatusFilter='ALL'">All <span>{{notifications.length}}</span></button>
+        <button class="fchip unread" [class.active]="notifStatusFilter==='UNREAD'" (click)="notifStatusFilter='UNREAD'">Unread <span>{{unreadCount}}</span></button>
+        <button class="fchip read" [class.active]="notifStatusFilter==='READ'" (click)="notifStatusFilter='READ'">Read <span>{{readCount}}</span></button>
+      </div>
+      <div class="filter-chips">
+        <button class="fchip" [class.active]="notifCategoryFilter==='ALL'" (click)="notifCategoryFilter='ALL'">All Categories</button>
+        <button class="fchip cat" *ngFor="let c of visibleCategories" [class.active]="notifCategoryFilter===c" (click)="notifCategoryFilter=c">{{c}}</button>
+      </div>
+    </div>
+
+    <!-- Notification cards -->
+    <div class="notif-list" *ngIf="filteredNotifications.length > 0">
+      <div class="notif-card" *ngFor="let n of filteredNotifications" [class.unread-card]="n.status === 'UNREAD'">
+        <div class="notif-left">
+          <div class="notif-icon" [ngClass]="n.category.toLowerCase()">
+            <mat-icon>{{ n.category === 'INCIDENT' ? 'report_problem' : n.category === 'TRANSPORT' ? 'directions_bus' : 'fact_check' }}</mat-icon>
+          </div>
+          <div class="notif-info">
+            <span class="notif-message">{{ n.message }}</span>
+            <div class="notif-meta">
+              <span class="category-pill" [ngClass]="n.category.toLowerCase()">{{ n.category }}</span>
+              <span class="notif-date"><mat-icon>schedule</mat-icon>{{ n.createdDate | date:'MMM d, y h:mm a' }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="notif-right">
+          <span class="status-pill" [ngClass]="n.status.toLowerCase()">{{ n.status }}</span>
+          <button class="mark-read-btn" *ngIf="n.status === 'UNREAD'" (click)="markRead(n.notificationId)" matTooltip="Mark as Read">
+            <mat-icon>done</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="empty-state" *ngIf="filteredNotifications.length === 0">
+      <mat-icon>notifications_none</mat-icon><p>No notifications found</p>
+    </div>
+  </div>
+
+</div>

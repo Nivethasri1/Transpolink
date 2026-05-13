@@ -32,6 +32,11 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public List<NotificationResponse> getAllNotifications() {
+        return notificationRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
+    @Override
     public List<NotificationResponse> getUnreadByUser(Long userId) {
         return notificationRepository.findByUserIdAndStatus(userId, NotificationStatus.UNREAD)
                 .stream().map(this::mapToResponse).collect(Collectors.toList());

@@ -4,6 +4,7 @@ import com.transpolink.incident.dto.*;
 import com.transpolink.incident.entity.Incident;
 import com.transpolink.incident.entity.Resolution;
 import com.transpolink.incident.enums.IncidentStatus;
+import com.transpolink.incident.enums.ResolutionStatus;
 import com.transpolink.incident.exception.IncidentNotFoundException;
 import com.transpolink.incident.repository.IncidentRepository;
 import com.transpolink.incident.repository.ResolutionRepository;
@@ -62,6 +63,13 @@ public class IncidentServiceImpl implements IncidentService {
                 .officerId(request.getOfficerId())
                 .actions(request.getActions())
                 .build();
+        // Auto-set incident to IN_PROGRESS when resolution is added
+        incidentRepository.findById(request.getIncidentId()).ifPresent(incident -> {
+            if (incident.getStatus() == IncidentStatus.REPORTED) {
+                incident.setStatus(IncidentStatus.IN_PROGRESS);
+                incidentRepository.save(incident);
+            }
+        });
         return mapToResolutionResponse(resolutionRepository.save(resolution));
     }
 
@@ -69,6 +77,22 @@ public class IncidentServiceImpl implements IncidentService {
     public List<ResolutionResponse> getResolutionsByIncident(Long incidentId) {
         return resolutionRepository.findByIncidentId(incidentId).stream()
                 .map(this::mapToResolutionResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public ResolutionResponse updateResolutionStatus(Long id, String status) {
+        Resolution resolution = resolutionRepository.findById(id)
+                .orElseThrow(() -> new IncidentNotFoundException("Resolution not found: " + id));
+        resolution.setStatus(ResolutionStatus.valueOf(status));
+        ResolutionResponse response = mapToResolutionResponse(resolutionRepository.save(resolution));
+        // Auto-update incident to RESOLVED when resolution is COMPLETED
+        if (ResolutionStatus.COMPLETED.name().equals(status)) {
+            incidentRepository.findById(resolution.getIncidentId()).ifPresent(incident -> {
+                incident.setStatus(IncidentStatus.RESOLVED);
+                incidentRepository.save(incident);
+            });
+        }
+        return response;
     }
 
     private IncidentResponse mapToResponse(Incident i) {
