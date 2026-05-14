@@ -127,6 +127,6 @@ export class NotificationsComponent implements OnInit {
     });
   }
 
-  get unreadCount() { return this.filteredNotifications.filter(n => n.status === 'UNREAD').length; }
-  get readCount()   { return this.filteredNotifications.filter(n => n.status === 'READ').length; }
+  get unreadCount() { return this.notifications.filter(n => n.status === 'UNREAD').length; }
+  get readCount()   { return this.notifications.filter(n => n.status === 'READ').length; }
 }

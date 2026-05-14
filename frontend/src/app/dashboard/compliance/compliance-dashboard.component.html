@@ -1,1 +1,262 @@
-<!-- Replaced by government-dashboard.component.ts and compliance-records.component.ts -->
+<div class="page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon"><mat-icon>fact_check</mat-icon></div>
+      <div>
+        <h2>Compliance Dashboard</h2>
+        <p>Manage compliance records, audits and regulatory oversight</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="action-btn primary" (click)="showRecordForm = !showRecordForm">
+        <mat-icon>{{ showRecordForm ? 'close' : 'add' }}</mat-icon>
+        {{ showRecordForm ? 'Cancel' : 'New Record' }}
+      </button>
+      <button class="action-btn secondary" (click)="showAuditForm = !showAuditForm">
+        <mat-icon>{{ showAuditForm ? 'close' : 'manage_search' }}</mat-icon>
+        {{ showAuditForm ? 'Cancel' : 'New Audit' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon-wrap compliant"><mat-icon>check_circle</mat-icon></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ passCount }}</div>
+        <div class="stat-label">Compliant</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap noncompliant"><mat-icon>cancel</mat-icon></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ failCount }}</div>
+        <div class="stat-label">Non-Compliant</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap review"><mat-icon>hourglass_empty</mat-icon></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ pendingCount }}</div>
+        <div class="stat-label">Under Review</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap completed"><mat-icon>verified</mat-icon></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ completedAudits }}</div>
+        <div class="stat-label">Completed Audits</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap active"><mat-icon>pending</mat-icon></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ activeAudits }}</div>
+        <div class="stat-label">Active Audits</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Record Form -->
+  <div class="form-panel" *ngIf="showRecordForm">
+    <div class="form-panel-header">
+      <mat-icon>fact_check</mat-icon>
+      <h3>New Compliance Record</h3>
+      <button class="close-btn" (click)="showRecordForm = false"><mat-icon>close</mat-icon></button>
+    </div>
+    <form [formGroup]="recordForm" (ngSubmit)="addRecord()" class="panel-form">
+      <mat-form-field appearance="outline" class="panel-field">
+        <mat-label>Entity ID</mat-label>
+        <input matInput type="number" formControlName="entityId" />
+        <mat-icon matSuffix>tag</mat-icon>
+        <mat-error>Required</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="panel-field">
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option *ngFor="let t of complianceTypes" [value]="t">{{ t }}</mat-option>
+        </mat-select>
+        <mat-error>Required</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="panel-field">
+        <mat-label>Result</mat-label>
+        <mat-select formControlName="result">
+          <mat-option *ngFor="let r of complianceResults" [value]="r">{{ r.replace('_',' ') }}</mat-option>
+        </mat-select>
+        <mat-error>Required</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="panel-field" style="flex:2">
+        <mat-label>Notes</mat-label>
+        <input matInput formControlName="notes" placeholder="Inspection notes..." />
+        <mat-error>Required</mat-error>
+      </mat-form-field>
+      <div class="panel-actions">
+        <button type="submit" class="submit-btn" [disabled]="recordForm.invalid"><mat-icon>save</mat-icon> Save Record</button>
+        <button type="button" class="cancel-btn" (click)="showRecordForm = false">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- New Audit Form -->
+  <div class="form-panel" *ngIf="showAuditForm">
+    <div class="form-panel-header accent">
+      <mat-icon>manage_search</mat-icon>
+      <h3>New Audit</h3>
+      <button class="close-btn" (click)="showAuditForm = false"><mat-icon>close</mat-icon></button>
+    </div>
+    <form [formGroup]="auditForm" (ngSubmit)="addAudit()" class="panel-form">
+      <mat-form-field appearance="outline" class="panel-field">
+        <mat-label>Scope</mat-label>
+        <input matInput formControlName="scope" placeholder="e.g. Fleet Safety Q1" />
+        <mat-icon matSuffix>search</mat-icon>
+        <mat-error>Required</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="panel-field" style="flex:2">
+        <mat-label>Findings</mat-label>
+        <textarea matInput formControlName="findings" rows="2" placeholder="Describe findings..."></textarea>
+        <mat-error>Required</mat-error>
+      </mat-form-field>
+      <div class="panel-actions">
+        <button type="submit" class="submit-btn" [disabled]="auditForm.invalid"><mat-icon>save</mat-icon> Save Audit</button>
+        <button type="button" class="cancel-btn" (click)="showAuditForm = false">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn" [class.active]="activeTab === 'overview'"  (click)="activeTab = 'overview'">
+      <mat-icon>dashboard</mat-icon> Overview
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'records'"  (click)="activeTab = 'records'">
+      <mat-icon>fact_check</mat-icon> Records
+      <span class="tab-count">{{ records.length }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'audits'"   (click)="activeTab = 'audits'">
+      <mat-icon>manage_search</mat-icon> Audits
+      <span class="tab-count">{{ audits.length }}</span>
+    </button>
+  </div>
+
+  <!-- OVERVIEW TAB -->
+  <div *ngIf="activeTab === 'overview'" class="overview-grid">
+
+    <!-- Recent Records -->
+    <div class="section-card">
+      <div class="section-header">
+        <h3><mat-icon>fact_check</mat-icon> Recent Records</h3>
+        <button class="see-all-btn" (click)="activeTab = 'records'">See All</button>
+      </div>
+      <div class="item-list" *ngIf="records.length > 0">
+        <div class="item-row" *ngFor="let r of records.slice(0,5)">
+          <div class="item-icon" [ngClass]="r.result.toLowerCase()">
+            <mat-icon>{{ r.result === 'COMPLIANT' ? 'check_circle' : r.result === 'NON_COMPLIANT' ? 'cancel' : 'hourglass_empty' }}</mat-icon>
+          </div>
+          <div class="item-info">
+            <span class="item-title">{{ r.type }} — Entity #{{ r.entityId }}</span>
+            <span class="item-sub">{{ r.notes }}</span>
+            <span class="item-meta"><mat-icon>calendar_today</mat-icon>{{ r.date | date:'mediumDate' }}</span>
+          </div>
+          <span class="pill" [ngClass]="r.result.toLowerCase()">{{ r.result.replace('_',' ') }}</span>
+        </div>
+      </div>
+      <div class="empty-state" *ngIf="records.length === 0">
+        <mat-icon>fact_check</mat-icon><p>No records yet</p>
+      </div>
+    </div>
+
+    <!-- Recent Audits -->
+    <div class="section-card">
+      <div class="section-header">
+        <h3><mat-icon>manage_search</mat-icon> Recent Audits</h3>
+        <button class="see-all-btn" (click)="activeTab = 'audits'">See All</button>
+      </div>
+      <div class="item-list" *ngIf="audits.length > 0">
+        <div class="item-row" *ngFor="let a of audits.slice(0,5)">
+          <div class="item-icon" [ngClass]="a.status.toLowerCase()">
+            <mat-icon>{{ a.status === 'PLANNED' ? 'event' : a.status === 'IN_PROGRESS' ? 'pending' : a.status === 'COMPLETED' ? 'verified' : 'block' }}</mat-icon>
+          </div>
+          <div class="item-info">
+            <span class="item-title">{{ a.scope }}</span>
+            <span class="item-sub">{{ a.findings || 'No findings recorded' }}</span>
+            <span class="item-meta"><mat-icon>calendar_today</mat-icon>{{ a.date | date:'mediumDate' }}</span>
+          </div>
+          <span class="pill" [ngClass]="a.status.toLowerCase()">{{ a.status.replace('_',' ') }}</span>
+        </div>
+      </div>
+      <div class="empty-state" *ngIf="audits.length === 0">
+        <mat-icon>manage_search</mat-icon><p>No audits yet</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RECORDS TAB -->
+  <div *ngIf="activeTab === 'records'">
+    <div class="filter-chips">
+      <button class="fchip"        [class.active]="recordFilter === 'ALL'"           (click)="recordFilter = 'ALL'">All <span>{{ records.length }}</span></button>
+      <button class="fchip pass"   [class.active]="recordFilter === 'COMPLIANT'"     (click)="recordFilter = 'COMPLIANT'">Compliant</button>
+      <button class="fchip fail"   [class.active]="recordFilter === 'NON_COMPLIANT'" (click)="recordFilter = 'NON_COMPLIANT'">Non-Compliant</button>
+      <button class="fchip review" [class.active]="recordFilter === 'UNDER_REVIEW'"  (click)="recordFilter = 'UNDER_REVIEW'">Under Review</button>
+    </div>
+    <div class="section-card">
+      <div class="item-list" *ngIf="filteredRecords.length > 0">
+        <div class="item-row" *ngFor="let r of filteredRecords">
+          <div class="item-icon" [ngClass]="r.result.toLowerCase()">
+            <mat-icon>{{ r.result === 'COMPLIANT' ? 'check_circle' : r.result === 'NON_COMPLIANT' ? 'cancel' : 'hourglass_empty' }}</mat-icon>
+          </div>
+          <div class="item-info">
+            <span class="item-title">{{ r.type }} — Entity #{{ r.entityId }}</span>
+            <span class="item-sub">{{ r.notes }}</span>
+            <span class="item-meta"><mat-icon>calendar_today</mat-icon>{{ r.date | date:'mediumDate' }}</span>
+          </div>
+          <span class="pill" [ngClass]="r.result.toLowerCase()">{{ r.result.replace('_',' ') }}</span>
+        </div>
+      </div>
+      <div class="empty-state" *ngIf="filteredRecords.length === 0">
+        <mat-icon>fact_check</mat-icon><p>No records found</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDITS TAB -->
+  <div *ngIf="activeTab === 'audits'">
+    <div class="filter-chips">
+      <button class="fchip"          [class.active]="auditFilter === 'ALL'"         (click)="auditFilter = 'ALL'">All <span>{{ audits.length }}</span></button>
+      <button class="fchip planned"  [class.active]="auditFilter === 'PLANNED'"     (click)="auditFilter = 'PLANNED'">Planned</button>
+      <button class="fchip progress" [class.active]="auditFilter === 'IN_PROGRESS'" (click)="auditFilter = 'IN_PROGRESS'">In Progress</button>
+      <button class="fchip done"     [class.active]="auditFilter === 'COMPLETED'"   (click)="auditFilter = 'COMPLETED'">Completed</button>
+      <button class="fchip cancel"   [class.active]="auditFilter === 'CANCELLED'"   (click)="auditFilter = 'CANCELLED'">Cancelled</button>
+    </div>
+    <div class="section-card">
+      <div class="item-list" *ngIf="filteredAudits.length > 0">
+        <div class="item-row" *ngFor="let a of filteredAudits">
+          <div class="item-icon" [ngClass]="a.status.toLowerCase()">
+            <mat-icon>{{ a.status === 'PLANNED' ? 'event' : a.status === 'IN_PROGRESS' ? 'pending' : a.status === 'COMPLETED' ? 'verified' : 'block' }}</mat-icon>
+          </div>
+          <div class="item-info">
+            <span class="item-title">{{ a.scope }}</span>
+            <span class="item-sub">{{ a.findings || 'No findings recorded' }}</span>
+            <span class="item-meta">
+              <mat-icon>person</mat-icon>Officer #{{ a.officerId }}
+              <mat-icon>calendar_today</mat-icon>{{ a.date | date:'mediumDate' }}
+            </span>
+          </div>
+          <div class="item-right">
+            <span class="pill" [ngClass]="a.status.toLowerCase()">{{ a.status.replace('_',' ') }}</span>
+            <mat-select class="status-select" placeholder="Update" (selectionChange)="updateAuditStatus(a.auditId, $event.value)">
+              <mat-option *ngFor="let s of auditStatuses" [value]="s">{{ s.replace('_',' ') }}</mat-option>
+            </mat-select>
+          </div>
+        </div>
+      </div>
+      <div class="empty-state" *ngIf="filteredAudits.length === 0">
+        <mat-icon>manage_search</mat-icon><p>No audits found</p>
+      </div>
+    </div>
+  </div>
+
+</div>

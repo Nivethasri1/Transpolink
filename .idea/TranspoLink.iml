@@ -2,7 +2,20 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/frontend/.angular" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules/@nodelib/fs.scandir/out" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules/@nodelib/fs.stat/out" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules/@nodelib/fs.walk/out" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules/encoding/node_modules/iconv-lite/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules/fast-glob/out" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules/is-what/.vscode" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules/needle/node_modules/iconv-lite/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules/source-map-loader/node_modules/iconv-lite/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules/typed-assert/.vscode" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

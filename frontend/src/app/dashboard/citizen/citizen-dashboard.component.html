@@ -1,46 +1,56 @@
 <div class="dashboard">
 
-  <div class="welcome">
-    <h2>Welcome to Transpolink</h2>
-    <p>Your city's transportation &amp; traffic management platform</p>
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-icon"><mat-icon>location_city</mat-icon></div>
+      <div>
+        <h1>Welcome to Transpolink</h1>
+        <p>Your city's smart transportation &amp; traffic management platform</p>
+      </div>
+    </div>
+    <div class="hero-badge"><mat-icon>person</mat-icon> Citizen Portal</div>
   </div>
 
   <div class="nav-grid">
 
     <a routerLink="/citizen/traffic" class="nav-card traffic">
-      <div class="card-icon">
-        <mat-icon>traffic</mat-icon>
+      <div class="card-top">
+        <div class="card-icon"><mat-icon>traffic</mat-icon></div>
+        <mat-icon class="arrow">arrow_forward</mat-icon>
       </div>
       <div class="card-label">Traffic Updates</div>
       <div class="card-desc">Live road segment status &amp; congestion info</div>
-      <mat-icon class="arrow">arrow_forward</mat-icon>
+      <div class="card-tag">Live</div>
     </a>
 
     <a routerLink="/citizen/routes" class="nav-card transport">
-      <div class="card-icon">
-        <mat-icon>directions_bus</mat-icon>
+      <div class="card-top">
+        <div class="card-icon"><mat-icon>directions_bus</mat-icon></div>
+        <mat-icon class="arrow">arrow_forward</mat-icon>
       </div>
       <div class="card-label">Transport Routes</div>
       <div class="card-desc">Bus &amp; train routes with schedules</div>
-      <mat-icon class="arrow">arrow_forward</mat-icon>
+      <div class="card-tag">Schedules</div>
     </a>
 
     <a routerLink="/incidents" class="nav-card incident">
-      <div class="card-icon">
-        <mat-icon>report_problem</mat-icon>
+      <div class="card-top">
+        <div class="card-icon"><mat-icon>report_problem</mat-icon></div>
+        <mat-icon class="arrow">arrow_forward</mat-icon>
       </div>
       <div class="card-label">Report Incident</div>
       <div class="card-desc">Report accidents, breakdowns &amp; roadblocks</div>
-      <mat-icon class="arrow">arrow_forward</mat-icon>
+      <div class="card-tag">Report</div>
     </a>
 
     <a routerLink="/notifications" class="nav-card notif">
-      <div class="card-icon">
-        <mat-icon>notifications</mat-icon>
+      <div class="card-top">
+        <div class="card-icon"><mat-icon>notifications</mat-icon></div>
+        <mat-icon class="arrow">arrow_forward</mat-icon>
       </div>
       <div class="card-label">Notifications</div>
       <div class="card-desc">Stay updated with latest alerts &amp; messages</div>
-      <mat-icon class="arrow">arrow_forward</mat-icon>
+      <div class="card-tag">Alerts</div>
     </a>
 
   </div>

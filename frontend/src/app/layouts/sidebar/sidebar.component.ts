@@ -34,10 +34,11 @@ const NAV_CONFIG: Record<Role, NavItem[]> = {
     { label: 'Notifications',  icon: 'notifications',  route: '/notifications' }
   ],
   TRANSPORT_OPERATOR: [
-    { label: 'Dashboard',  icon: 'dashboard',      route: '/transport' },
-    { label: 'Routes',     icon: 'route',          route: '/transport/routes' },
-    { label: 'Fleet',      icon: 'directions_bus', route: '/transport/fleet' },
-    { label: 'Notifications', icon: 'notifications', route: '/notifications' }
+    { label: 'Dashboard',     icon: 'dashboard',      route: '/transport' },
+    { label: 'Routes',        icon: 'route',          route: '/transport/routes' },
+    { label: 'Fleet',         icon: 'directions_bus', route: '/transport/fleet' },
+    { label: 'Incidents',     icon: 'report_problem', route: '/incidents' },
+    { label: 'Notifications', icon: 'notifications',  route: '/notifications' }
   ],
   COMPLIANCE_OFFICER: [
     { label: 'Dashboard',          icon: 'dashboard',      route: '/government' },

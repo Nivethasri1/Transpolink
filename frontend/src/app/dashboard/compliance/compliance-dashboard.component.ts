@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDividerModule } from '@angular/material/divider';
 import { ComplianceService } from '../../core/services/compliance.service';
 import { ComplianceRecordResponse, AuditResponse, ComplianceType, ComplianceResult, AuditStatus } from '../../core/models/compliance.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -17,7 +18,7 @@ import { AuthService } from '../../core/services/auth.service';
   imports: [
     CommonModule, ReactiveFormsModule, FormsModule,
     MatIconModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatSnackBarModule, MatTooltipModule
+    MatSelectModule, MatSnackBarModule, MatTooltipModule, MatDividerModule
   ],
   templateUrl: './compliance-dashboard.component.html',
   styleUrls: ['./compliance-dashboard.component.css']

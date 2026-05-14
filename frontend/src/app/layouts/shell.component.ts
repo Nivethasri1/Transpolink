@@ -23,10 +23,16 @@ import { NavbarComponent } from './navbar/navbar.component';
     </mat-sidenav-container>
   `,
   styles: [`
-    .shell-container { height: 100vh; }
+    .shell-container { height: 100vh; background: var(--bg-base); }
     .sidenav { border-right: none; }
-    .main-content { display: flex; flex-direction: column; }
-    .page-content { padding: 24px; flex: 1; background: #f5f5f5; min-height: calc(100vh - 64px); }
+    .main-content { display: flex; flex-direction: column; background: var(--bg-base); }
+    .page-content {
+      padding: 24px;
+      flex: 1;
+      background: var(--bg-base);
+      min-height: calc(100vh - 64px);
+      transition: background 0.3s ease;
+    }
   `]
 })
 export class ShellComponent {}

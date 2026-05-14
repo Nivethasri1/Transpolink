@@ -1,0 +1,254 @@
+<div class="landing">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <mat-icon class="brand-icon">traffic</mat-icon>
+        <span class="brand-name">Transpolink</span>
+      </div>
+      <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#roles"    class="nav-link">Roles</a>
+        <a href="#arch"     class="nav-link">Architecture</a>
+      </div>
+      <a routerLink="/login" class="nav-cta">
+        <mat-icon>login</mat-icon> Sign In
+      </a>
+      <button class="theme-toggle" (click)="theme.toggle()" [title]="theme.isDark() ? 'Switch to Light' : 'Switch to Dark'">
+        <mat-icon>{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+      <div class="orb orb3"></div>
+      <div class="hero-grid"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Smart City Infrastructure Platform
+      </div>
+      <h1 class="hero-title">
+        Intelligent<br>
+        <span class="hero-accent">Transportation</span><br>
+        Management
+      </h1>
+      <p class="hero-sub">
+        A unified platform for traffic officers, transport operators, compliance teams
+        and citizens — built to keep cities moving safely and efficiently.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/login" class="btn-primary">
+          <mat-icon>rocket_launch</mat-icon> Get Started
+        </a>
+        <a href="#features" class="btn-ghost">
+          <mat-icon>explore</mat-icon> Explore Features
+        </a>
+      </div>
+      <div class="hero-chips">
+        <span class="hchip"><mat-icon>verified_user</mat-icon> JWT Secured</span>
+        <span class="hchip"><mat-icon>hub</mat-icon> Microservices</span>
+        <span class="hchip"><mat-icon>bolt</mat-icon> Real-time</span>
+        <span class="hchip"><mat-icon>devices</mat-icon> Responsive</span>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="visual-card main-card">
+        <div class="vc-header">
+          <mat-icon>dashboard</mat-icon>
+          <span>Live Overview</span>
+          <span class="live-dot"></span>
+        </div>
+        <div class="vc-stats">
+          <div class="vc-stat"><div class="vc-val teal">24</div><div class="vc-lbl">Segments</div></div>
+          <div class="vc-stat"><div class="vc-val green">18</div><div class="vc-lbl">Open</div></div>
+          <div class="vc-stat"><div class="vc-val amber">4</div><div class="vc-lbl">Congested</div></div>
+          <div class="vc-stat"><div class="vc-val red">2</div><div class="vc-lbl">Incidents</div></div>
+        </div>
+        <div class="vc-bars">
+          <div class="vc-bar-row">
+            <span>Normal</span>
+            <div class="vc-track"><div class="vc-fill" style="width:72%;background:#10b981"></div></div>
+            <span>72%</span>
+          </div>
+          <div class="vc-bar-row">
+            <span>Slow</span>
+            <div class="vc-track"><div class="vc-fill" style="width:18%;background:#f59e0b"></div></div>
+            <span>18%</span>
+          </div>
+          <div class="vc-bar-row">
+            <span>Heavy</span>
+            <div class="vc-track"><div class="vc-fill" style="width:10%;background:#ef4444"></div></div>
+            <span>10%</span>
+          </div>
+        </div>
+      </div>
+      <div class="float-card fc1">
+        <mat-icon style="color:#f59e0b">directions_bus</mat-icon>
+        <div><div class="fc-val">142</div><div class="fc-lbl">Fleet Active</div></div>
+      </div>
+      <div class="float-card fc2">
+        <mat-icon style="color:#ef4444">report_problem</mat-icon>
+        <div><div class="fc-val">7</div><div class="fc-lbl">Incidents Today</div></div>
+      </div>
+      <div class="float-card fc3">
+        <mat-icon style="color:#10b981">verified</mat-icon>
+        <div><div class="fc-val">98%</div><div class="fc-lbl">Compliance</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS STRIP -->
+  <section class="stats-strip">
+    <div class="strip-inner">
+      <div class="strip-stat" *ngFor="let s of platformStats">
+        <div class="strip-val" [style.color]="s.color">{{s.value}}</div>
+        <div class="strip-lbl">{{s.label}}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="section-inner">
+      <div class="section-label">Core Capabilities</div>
+      <h2 class="section-title">Everything you need to manage <span class="accent">urban transportation</span></h2>
+      <p class="section-sub">Seven integrated microservices working in harmony to deliver a complete transportation management ecosystem.</p>
+      <div class="features-grid">
+        <div class="feature-card" *ngFor="let f of features">
+          <div class="feat-icon" [style.background]="f.iconBg">
+            <mat-icon [style.color]="f.iconColor">{{f.icon}}</mat-icon>
+          </div>
+          <h3 class="feat-title">{{f.title}}</h3>
+          <p class="feat-desc">{{f.desc}}</p>
+          <div class="feat-tags">
+            <span class="feat-tag" *ngFor="let t of f.tags">{{t}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROLES -->
+  <section class="roles" id="roles">
+    <div class="section-inner">
+      <div class="section-label">Role-Based Access Control</div>
+      <h2 class="section-title">Tailored dashboards for <span class="accent">every stakeholder</span></h2>
+      <p class="section-sub">Each role gets a purpose-built workspace with exactly the tools they need.</p>
+      <div class="roles-grid">
+        <div class="role-card" *ngFor="let r of roles">
+          <div class="role-header">
+            <div class="role-icon" [style.background]="r.iconBg">
+              <mat-icon [style.color]="r.color">{{r.icon}}</mat-icon>
+            </div>
+            <span class="role-badge" [style.background]="r.badgeBg" [style.color]="r.color">{{r.badge}}</span>
+          </div>
+          <h3 class="role-title">{{r.title}}</h3>
+          <p class="role-desc">{{r.desc}}</p>
+          <ul class="role-perms">
+            <li *ngFor="let p of r.perms">
+              <mat-icon [style.color]="r.color">check_circle</mat-icon>{{p}}
+            </li>
+          </ul>
+          <div class="role-route" [style.color]="r.color">
+            <mat-icon>link</mat-icon> {{r.route}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section class="arch" id="arch">
+    <div class="section-inner">
+      <div class="section-label">System Architecture</div>
+      <h2 class="section-title">Built on <span class="accent">microservices</span></h2>
+      <p class="section-sub">Spring Boot services behind a unified API Gateway with Eureka service discovery and JWT authentication.</p>
+      <div class="arch-diagram">
+        <div class="arch-node frontend-node">
+          <mat-icon>web</mat-icon>
+          <span>Angular 17 Frontend</span>
+          <small>localhost:4200</small>
+        </div>
+        <div class="arch-arrow-down"><mat-icon>arrow_downward</mat-icon><span>HTTP / REST</span></div>
+        <div class="arch-node gateway-node">
+          <mat-icon>hub</mat-icon>
+          <span>API Gateway</span>
+          <small>:8099 · JWT Validation · Routing</small>
+        </div>
+        <div class="arch-arrow-down"><mat-icon>arrow_downward</mat-icon><span>Service Routing</span></div>
+        <div class="arch-services">
+          <div class="arch-svc" *ngFor="let s of services">
+            <mat-icon>{{s.icon}}</mat-icon>
+            <span>{{s.name}}</span>
+            <small>{{s.port}}</small>
+          </div>
+        </div>
+        <div class="arch-eureka">
+          <mat-icon>account_tree</mat-icon>
+          <span>Eureka Service Registry · :8761</span>
+        </div>
+        <div class="arch-db">
+          <mat-icon>storage</mat-icon>
+          <span>MySQL 8 · 7 Databases</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section class="tech">
+    <div class="section-inner">
+      <div class="section-label">Tech Stack</div>
+      <h2 class="section-title">Enterprise-grade <span class="accent">technologies</span></h2>
+      <div class="tech-grid">
+        <div class="tech-item" *ngFor="let t of techStack">
+          <div class="tech-icon" [style.background]="t.bg">
+            <mat-icon [style.color]="t.color">{{t.icon}}</mat-icon>
+          </div>
+          <div class="tech-name">{{t.name}}</div>
+          <div class="tech-desc">{{t.desc}}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="cta-bg">
+      <div class="cta-orb co1"></div>
+      <div class="cta-orb co2"></div>
+    </div>
+    <div class="cta-content">
+      <mat-icon class="cta-icon">traffic</mat-icon>
+      <h2>Ready to manage your city's transportation?</h2>
+      <p>Sign in with your assigned credentials and access your personalised dashboard.</p>
+      <a routerLink="/login" class="btn-primary large">
+        <mat-icon>login</mat-icon> Sign In to Transpolink
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <mat-icon>traffic</mat-icon>
+        <span>Transpolink</span>
+      </div>
+      <p class="footer-copy">Transportation &amp; Traffic Management System · Angular 17 &amp; Spring Boot 3</p>
+      <div class="footer-links">
+        <a routerLink="/login">Sign In</a>
+        <span>·</span>
+        <a routerLink="/register">Register</a>
+      </div>
+    </div>
+  </footer>
+
+</div>

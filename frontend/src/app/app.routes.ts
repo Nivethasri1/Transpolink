@@ -4,6 +4,7 @@ import { roleGuard }      from './core/guards/role.guard';
 import { adminOnlyGuard } from './core/guards/admin-only.guard';
 
 import { LoginComponent }              from './auth/login.component';
+import { LandingComponent }            from './landing/landing.component';
 import { RegisterComponent }           from './auth/register.component';
 import { ShellComponent }              from './layouts/shell.component';
 import { UnauthorizedComponent }       from './shared/components/unauthorized/unauthorized.component';
@@ -12,7 +13,7 @@ import { AdminDashboardComponent }     from './dashboard/admin/admin-dashboard.c
 import { TrafficDashboardComponent }   from './dashboard/traffic/traffic-dashboard.component';
 import { TrafficRoadsComponent }       from './dashboard/traffic/traffic-roads.component';
 import { TrafficFlowsComponent }       from './dashboard/traffic/traffic-flows.component';
-import { GovernmentDashboardComponent } from './dashboard/government/government-dashboard.component';
+import { ComplianceDashboardComponent }  from './dashboard/compliance/compliance-dashboard.component';
 import { ComplianceRecordsComponent }   from './dashboard/compliance/compliance-records.component';
 import { ComplianceAuditsComponent }    from './dashboard/compliance/compliance-audits.component';
 import { TransportDashboardComponent } from './dashboard/transport-company/transport-dashboard.component';
@@ -27,7 +28,7 @@ import { ReportsComponent }            from './dashboard/reports/reports.compone
 
 export const routes: Routes = [
   // Public
-  { path: '',             redirectTo: 'login', pathMatch: 'full' },
+  { path: '',             component: LandingComponent, pathMatch: 'full' },
   { path: 'login',        component: LoginComponent },
   { path: 'unauthorized', component: UnauthorizedComponent },
 
@@ -48,7 +49,7 @@ export const routes: Routes = [
       { path: 'traffic/flows',   component: TrafficFlowsComponent,        canActivate: [roleGuard(['TRAFFIC_OFFICER', 'ADMIN'])] },
 
       // COMPLIANCE_OFFICER — compliance, audits, reports
-      { path: 'government',           component: GovernmentDashboardComponent, canActivate: [roleGuard(['COMPLIANCE_OFFICER', 'ADMIN'])] },
+      { path: 'government',           component: ComplianceDashboardComponent,  canActivate: [roleGuard(['COMPLIANCE_OFFICER', 'ADMIN'])] },
       { path: 'compliance/records',   component: ComplianceRecordsComponent,   canActivate: [roleGuard(['COMPLIANCE_OFFICER', 'ADMIN'])] },
       { path: 'compliance/audits',    component: ComplianceAuditsComponent,    canActivate: [roleGuard(['COMPLIANCE_OFFICER', 'ADMIN'])] },
 
@@ -62,8 +63,8 @@ export const routes: Routes = [
       { path: 'citizen/traffic',  component: CitizenTrafficComponent,      canActivate: [roleGuard(['CITIZEN', 'ADMIN'])] },
       { path: 'citizen/routes',   component: CitizenRoutesComponent,       canActivate: [roleGuard(['CITIZEN', 'ADMIN'])] },
 
-      // Incidents — CITIZEN + TRAFFIC_OFFICER + ADMIN
-      { path: 'incidents',  component: IncidentDashboardComponent,   canActivate: [roleGuard(['CITIZEN', 'TRAFFIC_OFFICER', 'ADMIN'])] },
+      // Incidents — CITIZEN + TRAFFIC_OFFICER + TRANSPORT_OPERATOR + ADMIN
+      { path: 'incidents',  component: IncidentDashboardComponent,   canActivate: [roleGuard(['CITIZEN', 'TRAFFIC_OFFICER', 'TRANSPORT_OPERATOR', 'ADMIN'])] },
 
       // Notifications — all authenticated roles
       { path: 'notifications', component: NotificationsComponent,   canActivate: [roleGuard(['ADMIN', 'CITIZEN', 'TRAFFIC_OFFICER', 'TRANSPORT_OPERATOR', 'COMPLIANCE_OFFICER'])] },

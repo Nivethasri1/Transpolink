@@ -1,32 +1,88 @@
 <div class="page">
-  <div class="page-header">
-    <h2><mat-icon style="vertical-align:middle;margin-right:8px;font-size:24px;width:24px;height:24px;">admin_panel_settings</mat-icon>Admin Dashboard</h2>
+
+  <!-- Hero Header -->
+  <div class="hero-header">
+    <div class="hero-left">
+      <div class="hero-icon"><mat-icon>admin_panel_settings</mat-icon></div>
+      <div>
+        <h1>Admin Control Center</h1>
+        <p>Full system oversight — users, modules, approvals</p>
+      </div>
+    </div>
+    <div class="hero-meta">
+      <div class="meta-chip"><mat-icon>people</mat-icon> {{ allUsers.length }} Total Users</div>
+      <div class="meta-chip warn" *ngIf="pendingUsers.length > 0"><mat-icon>pending_actions</mat-icon> {{ pendingUsers.length }} Awaiting Approval</div>
+    </div>
   </div>
 
-  <!-- Stats -->
+  <!-- Stats Row -->
   <div class="stats-grid">
-    <app-stat-card label="Pending Approval" [value]="pendingUsers.length" icon="pending_actions" color="#ff9800"></app-stat-card>
-    <app-stat-card label="Active Users" [value]="activeUsers.length" icon="people" color="#4caf50"></app-stat-card>
-    <app-stat-card label="Rejected" [value]="rejectedCount" icon="cancel" color="#f44336"></app-stat-card>
-    <app-stat-card label="Suspended" [value]="suspendedCount" icon="block" color="#9c27b0"></app-stat-card>
+    <div class="stat-card primary">
+      <div class="stat-icon"><mat-icon>people</mat-icon></div>
+      <div class="stat-info">
+        <div class="stat-value">{{ activeUsers.length }}</div>
+        <div class="stat-label">Active Users</div>
+      </div>
+      <div class="stat-trend up"><mat-icon>trending_up</mat-icon></div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-icon"><mat-icon>pending_actions</mat-icon></div>
+      <div class="stat-info">
+        <div class="stat-value">{{ pendingUsers.length }}</div>
+        <div class="stat-label">Pending Approval</div>
+      </div>
+      <div class="stat-badge" *ngIf="pendingUsers.length > 0">Action needed</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-icon"><mat-icon>cancel</mat-icon></div>
+      <div class="stat-info">
+        <div class="stat-value">{{ rejectedCount }}</div>
+        <div class="stat-label">Rejected</div>
+      </div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-icon"><mat-icon>block</mat-icon></div>
+      <div class="stat-info">
+        <div class="stat-value">{{ suspendedCount }}</div>
+        <div class="stat-label">Suspended</div>
+      </div>
+    </div>
   </div>
 
-  <mat-tab-group>
+  <!-- Role Breakdown -->
+  <div class="section-card">
+    <div class="section-header">
+      <h3><mat-icon>donut_large</mat-icon> User Role Breakdown</h3>
+    </div>
+    <div class="role-breakdown">
+      <div class="role-bar-item" *ngFor="let r of roleBreakdown">
+        <div class="role-bar-label">
+          <mat-icon [style.color]="r.color">{{ r.icon }}</mat-icon>
+          <span>{{ r.label }}</span>
+        </div>
+        <div class="role-bar-track">
+          <div class="role-bar-fill" [style.width.%]="r.pct" [style.background]="r.color"></div>
+        </div>
+        <span class="role-bar-count" [style.color]="r.color">{{ r.count }}</span>
+      </div>
+    </div>
+  </div>
 
-    <!-- PENDING APPROVALS TAB -->
+  <!-- Main Tabs -->
+  <mat-tab-group class="main-tabs">
+
+    <!-- PENDING APPROVALS -->
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon class="tab-icon">pending_actions</mat-icon>
         Pending Approvals
         <span class="badge" *ngIf="pendingUsers.length > 0">{{ pendingUsers.length }}</span>
       </ng-template>
-
       <div class="tab-content">
         <div class="empty-state" *ngIf="pendingUsers.length === 0">
           <mat-icon>check_circle</mat-icon>
-          <p>No pending approvals</p>
+          <p>All caught up — no pending approvals</p>
         </div>
-
         <div class="approval-cards" *ngIf="pendingUsers.length > 0">
           <mat-card class="approval-card" *ngFor="let user of pendingUsers">
             <div class="user-info">
@@ -38,23 +94,15 @@
               </div>
               <span class="status-badge pending">PENDING</span>
             </div>
-
             <div class="approval-actions">
               <div class="requested-role">
                 <mat-icon>badge</mat-icon>
                 <span>Requested as: <strong>{{ user.role }}</strong></span>
               </div>
-
-              <button mat-raised-button
-                      style="background:#40513B;color:white;"
-                      (click)="approve(user)"
-                      matTooltip="Approve registration">
+              <button mat-raised-button class="approve-btn" (click)="approve(user)" matTooltip="Approve registration">
                 <mat-icon>check_circle</mat-icon> Approve
               </button>
-
-              <button mat-stroked-button color="warn"
-                      (click)="reject(user)"
-                      matTooltip="Reject registration">
+              <button mat-stroked-button color="warn" (click)="reject(user)" matTooltip="Reject registration">
                 <mat-icon>cancel</mat-icon> Reject
               </button>
             </div>
@@ -63,10 +111,12 @@
       </div>
     </mat-tab>
 
-    <!-- ALL USERS TAB -->
-    <mat-tab label="All Users">
+    <!-- ALL USERS -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">people</mat-icon> All Users
+      </ng-template>
       <div class="tab-content">
-        <!-- Search + Filter -->
         <div class="filter-bar">
           <div class="search-box">
             <mat-icon>search</mat-icon>
@@ -83,56 +133,38 @@
         </div>
         <div class="table-wrapper">
           <table mat-table [dataSource]="filteredUsers" class="full-table">
-            <ng-container matColumnDef="userId">
-              <th mat-header-cell *matHeaderCellDef>#</th>
-              <td mat-cell *matCellDef="let u">{{ u.userId }}</td>
-            </ng-container>
-
+            <ng-container matColumnDef="userId"><th mat-header-cell *matHeaderCellDef>#</th><td mat-cell *matCellDef="let u">{{ u.userId }}</td></ng-container>
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef>Name</th>
-              <td mat-cell *matCellDef="let u">{{ u.name }}</td>
+              <td mat-cell *matCellDef="let u">
+                <div class="user-cell">
+                  <div class="user-cell-avatar">{{ u.name.charAt(0).toUpperCase() }}</div>
+                  <span>{{ u.name }}</span>
+                </div>
+              </td>
             </ng-container>
-
-            <ng-container matColumnDef="email">
-              <th mat-header-cell *matHeaderCellDef>Email</th>
-              <td mat-cell *matCellDef="let u">{{ u.email }}</td>
-            </ng-container>
-
+            <ng-container matColumnDef="email"><th mat-header-cell *matHeaderCellDef>Email</th><td mat-cell *matCellDef="let u">{{ u.email }}</td></ng-container>
             <ng-container matColumnDef="role">
               <th mat-header-cell *matHeaderCellDef>Role</th>
               <td mat-cell *matCellDef="let u">
-                <span class="role-badge" *ngIf="u.role">{{ u.role }}</span>
+                <span class="role-badge" *ngIf="u.role">{{ u.role.replace('_',' ') }}</span>
                 <span class="no-role" *ngIf="!u.role">—</span>
               </td>
             </ng-container>
-
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef>Status</th>
-              <td mat-cell *matCellDef="let u">
-                <span class="status-badge" [ngClass]="u.status.toLowerCase()">{{ u.status }}</span>
-              </td>
+              <td mat-cell *matCellDef="let u"><span class="status-badge" [ngClass]="u.status.toLowerCase()">{{ u.status }}</span></td>
             </ng-container>
-
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef>Actions</th>
               <td mat-cell *matCellDef="let u">
-                <mat-select placeholder="Change Role" class="inline-select"
-                            *ngIf="u.status === 'ACTIVE'"
-                            (selectionChange)="updateRole(u, $event.value)">
+                <mat-select placeholder="Change Role" class="inline-select" *ngIf="u.status === 'ACTIVE'" (selectionChange)="updateRole(u, $event.value)">
                   <mat-option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</mat-option>
                 </mat-select>
-                <button mat-icon-button color="warn"
-                        *ngIf="u.status === 'ACTIVE'"
-                        (click)="suspend(u)" matTooltip="Suspend">
-                  <mat-icon>block</mat-icon>
-                </button>
-                <button mat-icon-button color="warn"
-                        (click)="deleteUser(u)" matTooltip="Delete">
-                  <mat-icon>delete</mat-icon>
-                </button>
+                <button mat-icon-button color="warn" *ngIf="u.status === 'ACTIVE'" (click)="suspend(u)" matTooltip="Suspend"><mat-icon>block</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="deleteUser(u)" matTooltip="Delete"><mat-icon>delete</mat-icon></button>
               </td>
             </ng-container>
-
             <tr mat-header-row *matHeaderRowDef="activeCols"></tr>
             <tr mat-row *matRowDef="let row; columns: activeCols;"></tr>
           </table>
@@ -140,28 +172,61 @@
       </div>
     </mat-tab>
 
-    <!-- QUICK LINKS TAB -->
-    <mat-tab label="Modules">
+    <!-- MODULES -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">apps</mat-icon> Modules
+      </ng-template>
       <div class="tab-content">
-        <div class="quick-links">
-          <mat-card class="link-card" routerLink="/traffic">
-            <mat-icon>traffic</mat-icon><span>Traffic Monitoring</span>
-          </mat-card>
-          <mat-card class="link-card" routerLink="/fleet">
-            <mat-icon>directions_bus</mat-icon><span>Fleet Management</span>
-          </mat-card>
-          <mat-card class="link-card" routerLink="/compliance">
-            <mat-icon>fact_check</mat-icon><span>Compliance</span>
-          </mat-card>
-          <mat-card class="link-card" routerLink="/incidents">
-            <mat-icon>report_problem</mat-icon><span>Incidents</span>
-          </mat-card>
-          <mat-card class="link-card" routerLink="/notifications">
-            <mat-icon>notifications</mat-icon><span>Notifications</span>
-          </mat-card>
-          <mat-card class="link-card" routerLink="/reports">
-            <mat-icon>bar_chart</mat-icon><span>Reports</span>
-          </mat-card>
+        <div class="module-grid">
+          <a class="module-card traffic" routerLink="/traffic">
+            <div class="module-icon"><mat-icon>traffic</mat-icon></div>
+            <div class="module-info">
+              <span class="module-name">Traffic Monitoring</span>
+              <span class="module-desc">Road segments & flow data</span>
+            </div>
+            <mat-icon class="module-arrow">arrow_forward_ios</mat-icon>
+          </a>
+          <a class="module-card transport" routerLink="/transport">
+            <div class="module-icon"><mat-icon>directions_bus</mat-icon></div>
+            <div class="module-info">
+              <span class="module-name">Transport Ops</span>
+              <span class="module-desc">Routes, fleet & schedules</span>
+            </div>
+            <mat-icon class="module-arrow">arrow_forward_ios</mat-icon>
+          </a>
+          <a class="module-card compliance" routerLink="/government">
+            <div class="module-icon"><mat-icon>fact_check</mat-icon></div>
+            <div class="module-info">
+              <span class="module-name">Compliance & Audit</span>
+              <span class="module-desc">Records, audits & reports</span>
+            </div>
+            <mat-icon class="module-arrow">arrow_forward_ios</mat-icon>
+          </a>
+          <a class="module-card incident" routerLink="/incidents">
+            <div class="module-icon"><mat-icon>report_problem</mat-icon></div>
+            <div class="module-info">
+              <span class="module-name">Incidents</span>
+              <span class="module-desc">Reports & resolutions</span>
+            </div>
+            <mat-icon class="module-arrow">arrow_forward_ios</mat-icon>
+          </a>
+          <a class="module-card notif" routerLink="/notifications">
+            <div class="module-icon"><mat-icon>notifications</mat-icon></div>
+            <div class="module-info">
+              <span class="module-name">Notifications</span>
+              <span class="module-desc">Alerts & messages</span>
+            </div>
+            <mat-icon class="module-arrow">arrow_forward_ios</mat-icon>
+          </a>
+          <a class="module-card reports" routerLink="/reports">
+            <div class="module-icon"><mat-icon>bar_chart</mat-icon></div>
+            <div class="module-info">
+              <span class="module-name">Reports</span>
+              <span class="module-desc">Analytics & PDF exports</span>
+            </div>
+            <mat-icon class="module-arrow">arrow_forward_ios</mat-icon>
+          </a>
         </div>
       </div>
     </mat-tab>

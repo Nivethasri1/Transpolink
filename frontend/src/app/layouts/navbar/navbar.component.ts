@@ -10,6 +10,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-navbar',
@@ -24,7 +25,11 @@ export class NavbarComponent implements OnInit {
   roleLabel = this.auth.getRole()?.replace(/_/g, ' ') ?? '';
   unreadCount = 0;
 
-  constructor(private auth: AuthService, private notifService: NotificationService) {}
+  constructor(
+    private auth: AuthService,
+    private notifService: NotificationService,
+    public theme: ThemeService
+  ) {}
 
   ngOnInit(): void {
     this.notifService.unreadCount$.subscribe(count => this.unreadCount = count);

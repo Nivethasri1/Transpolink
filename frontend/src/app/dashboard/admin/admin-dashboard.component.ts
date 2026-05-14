@@ -116,4 +116,20 @@ export class AdminDashboardComponent implements OnInit {
 
   get rejectedCount() { return this.allUsers.filter(u => u.status === 'REJECTED').length; }
   get suspendedCount() { return this.allUsers.filter(u => u.status === 'SUSPENDED').length; }
+
+  get roleBreakdown() {
+    const total = this.allUsers.length || 1;
+    const roles = [
+      { key: 'ADMIN',               label: 'Admin',               icon: 'admin_panel_settings', color: 'var(--color-primary)' },
+      { key: 'TRAFFIC_OFFICER',     label: 'Traffic Officer',     icon: 'traffic',              color: 'var(--color-secondary)' },
+      { key: 'TRANSPORT_OPERATOR',  label: 'Transport Operator',  icon: 'directions_bus',       color: '#2563eb' },
+      { key: 'COMPLIANCE_OFFICER',  label: 'Compliance Officer',  icon: 'fact_check',           color: '#7c3aed' },
+      { key: 'CITIZEN',             label: 'Citizen',             icon: 'person',               color: 'var(--color-success)' },
+    ];
+    return roles.map(r => ({
+      ...r,
+      count: this.allUsers.filter(u => u.role === r.key).length,
+      pct: Math.round((this.allUsers.filter(u => u.role === r.key).length / total) * 100)
+    }));
+  }
 }

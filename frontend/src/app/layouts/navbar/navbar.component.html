@@ -10,12 +10,20 @@
 
   <span class="spacer"></span>
 
-  <a routerLink="/notifications" class="notif-btn" matTooltip="Notifications">
+  <!-- Theme toggle -->
+  <button mat-icon-button class="icon-btn" (click)="theme.toggle()"
+          [matTooltip]="theme.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+    <mat-icon>{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+
+  <!-- Notifications -->
+  <a routerLink="/notifications" class="icon-btn notif-btn" matTooltip="Notifications">
     <mat-icon [matBadge]="unreadCount > 0 ? unreadCount : null"
               matBadgeColor="warn"
               matBadgeSize="small">notifications</mat-icon>
   </a>
 
+  <!-- User chip -->
   <button class="user-chip" [matMenuTriggerFor]="userMenu">
     <div class="user-avatar">{{ userName ? userName.charAt(0).toUpperCase() : 'U' }}</div>
     <div class="user-info">
