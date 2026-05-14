@@ -97,8 +97,8 @@ backend/setup-databases.sql
 
 All services use:
 - Host: `localhost:3306`
-- Username: `root`
-- Password: `root`
+- Username: `${username}`
+- Password: `${password}`
 
 Update `application.properties` in each service if your credentials differ.
 
