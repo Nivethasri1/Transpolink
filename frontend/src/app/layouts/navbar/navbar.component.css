@@ -23,22 +23,43 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
-.brand-icon {
-  font-size: 26px;
-  width: 26px;
-  height: 26px;
-  color: var(--color-primary);
-  filter: drop-shadow(0 0 6px var(--color-primary-glow));
+.brand-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #0B2A35, var(--color-primary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px var(--color-primary-glow);
+  flex-shrink: 0;
+}
+
+.brand-logo mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
 }
 
 .brand-name {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
-  letter-spacing: 0.4px;
+  letter-spacing: -0.3px;
+}
+
+.brand-accent {
+  color: var(--color-primary);
 }
 
 .spacer { flex: 1; }

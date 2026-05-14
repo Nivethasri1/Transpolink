@@ -12,11 +12,14 @@ import { RouteResponse, ScheduleResponse } from '../../core/models/transport.mod
   template: `
     <div class="cr-page">
       <div class="cr-header">
-        <div class="cr-header-icon"><mat-icon>directions_bus</mat-icon></div>
-        <div>
-          <h2>Transport Routes</h2>
-          <p>Available bus and train routes with schedules</p>
+        <div class="cr-header-left">
+          <div class="cr-header-icon"><mat-icon>directions_bus</mat-icon></div>
+          <div>
+            <h2>Transport Routes</h2>
+            <p>Available bus and train routes with schedules</p>
+          </div>
         </div>
+        <div class="route-count-badge"><mat-icon>route</mat-icon> {{ routes.length }} Routes</div>
       </div>
 
       <div class="mini-stats">
@@ -79,66 +82,90 @@ import { RouteResponse, ScheduleResponse } from '../../core/models/transport.mod
     </div>
   `,
   styles: [`
-    .cr-page{display:flex;flex-direction:column;gap:20px}
-    .cr-header{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#40513B,#609966);border-radius:16px;padding:24px 28px;box-shadow:0 4px 20px rgba(64,81,59,0.3)}
-    .cr-header-icon{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center}
-    .cr-header-icon mat-icon{font-size:28px;width:28px;height:28px;color:white}
-    .cr-header h2{font-size:22px;font-weight:700;color:white;margin:0 0 4px}
-    .cr-header p{font-size:13px;color:rgba(255,255,255,0.75);margin:0}
+    .cr-page{display:flex;flex-direction:column;gap:24px}
+
+    /* Header */
+    .cr-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;background:linear-gradient(135deg,#0B2A35,#0D3D4A,#0F4D5C);border-radius:20px;padding:28px 34px;box-shadow:0 8px 32px rgba(13,148,136,0.25);position:relative;overflow:hidden}
+    .cr-header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% 50%,rgba(13,148,136,0.18) 0%,transparent 55%)}
+    .cr-header::after{content:'';position:absolute;right:-50px;top:-50px;width:240px;height:240px;border-radius:50%;border:2px solid rgba(13,148,136,0.12);pointer-events:none}
+    .cr-header-left{display:flex;align-items:center;gap:18px;position:relative}
+    .cr-header-icon{width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+    .cr-header-icon mat-icon{font-size:32px;width:32px;height:32px;color:var(--color-primary)}
+    .cr-header h2{font-size:22px;font-weight:800;color:white;margin:0 0 5px}
+    .cr-header p{font-size:13px;color:rgba(255,255,255,0.6);margin:0}
+    .route-count-badge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:9px 18px;font-size:13px;font-weight:600;color:white;position:relative}
+    .route-count-badge mat-icon{font-size:16px;width:16px;height:16px;color:var(--color-primary)}
+
+    /* Mini stats */
     .mini-stats{display:flex;gap:12px;flex-wrap:wrap}
-    .mini-stat{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;border:2px solid transparent}
-    .mini-stat:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(64,81,59,0.15)}
-    .mini-stat mat-icon{font-size:18px;width:18px;height:18px}
-    .mini-stat.active{background:#EDF1D6;color:#40513B}
-    .mini-stat.bus{background:#e8f5e9;color:#2e7d32}
-    .mini-stat.train{background:#e3f2fd;color:#1565c0}
-    .mini-stat.total{background:#f5f5f5;color:#555}
-    .mini-stat.active-filter{border-color:#40513B;box-shadow:0 4px 12px rgba(64,81,59,0.25);transform:translateY(-2px)}
-    .search-bar{display:flex;align-items:center;gap:10px;background:#f8faf5;border:2px solid #EDF1D6;border-radius:10px;padding:10px 14px}
-    .search-bar:focus-within{border-color:#9DC08B}
-    .search-bar mat-icon{color:#9DC08B}
-    .search-bar input{flex:1;border:none;background:none;outline:none;font-size:14px}
-    .search-bar button{background:none;border:none;cursor:pointer;color:#999;display:flex;align-items:center}
+    .mini-stat{display:flex;align-items:center;gap:10px;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;border:1.5px solid var(--border-subtle);background:var(--bg-surface);color:var(--text-secondary);box-shadow:var(--shadow-sm)}
+    .mini-stat:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--color-primary)}
+    .mini-stat mat-icon{font-size:20px;width:20px;height:20px}
+    .mini-stat.total mat-icon{color:var(--color-primary)}
+    .mini-stat.active{color:var(--color-success)} .mini-stat.active mat-icon{color:var(--color-success)}
+    .mini-stat.bus{color:var(--color-primary-dark)} .mini-stat.bus mat-icon{color:var(--color-primary)}
+    .mini-stat.train{color:#2563eb} .mini-stat.train mat-icon{color:#2563eb}
+    .mini-stat.active-filter{border-color:var(--color-primary) !important;background:var(--color-primary-light);box-shadow:0 4px 14px var(--color-primary-glow);transform:translateY(-2px)}
+
+    /* Search */
+    .search-bar{display:flex;align-items:center;gap:10px;background:var(--bg-muted);border:1.5px solid var(--border-color);border-radius:10px;padding:10px 14px;transition:border-color 0.2s,box-shadow 0.2s}
+    .search-bar:focus-within{border-color:var(--color-primary);box-shadow:0 0 0 3px var(--color-primary-glow)}
+    .search-bar mat-icon{color:var(--color-primary)}
+    .search-bar input{flex:1;border:none;background:none;outline:none;font-size:14px;color:var(--text-primary)}
+    .search-bar input::placeholder{color:var(--text-muted)}
+    .search-bar button{background:none;border:none;cursor:pointer;color:var(--text-muted);display:flex;align-items:center}
+
+    /* Route grid */
     .route-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
-    .route-card{background:white;border-radius:14px;padding:18px;border:1px solid #EDF1D6;box-shadow:0 2px 10px rgba(64,81,59,0.07);display:flex;flex-direction:column;gap:14px;transition:box-shadow 0.2s,transform 0.2s}
-    .route-card:hover{box-shadow:0 6px 20px rgba(64,81,59,0.13);transform:translateY(-2px)}
+    .route-card{background:var(--bg-surface);border-radius:16px;padding:20px;border:1px solid var(--border-subtle);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:16px;transition:all 0.2s}
+    .route-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px);border-color:var(--color-primary)}
     .route-card-header{display:flex;align-items:center;justify-content:space-between}
-    .route-type-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700}
+    .route-type-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700}
     .route-type-badge mat-icon{font-size:16px;width:16px;height:16px}
-    .route-type-badge.bus{background:#EDF1D6;color:#40513B}
-    .route-type-badge.train{background:#e3f2fd;color:#1565c0}
-    .route-path{display:flex;align-items:center;gap:8px;background:#f8faf5;border-radius:10px;padding:12px}
-    .route-point{display:flex;align-items:center;gap:4px;font-size:13px;color:#444;font-weight:600;flex:1}
-    .route-point mat-icon{font-size:14px;width:14px;height:14px}
-    .route-point.from mat-icon{color:#40513B}
-    .route-point.to mat-icon{color:#609966}
-    .route-arrow{color:#9DC08B;display:flex;align-items:center}
+    .route-type-badge.bus{background:var(--color-primary-light);color:var(--color-primary-dark)}
+    .route-type-badge.train{background:rgba(37,99,235,0.12);color:#2563eb}
+
+    /* Route path */
+    .route-path{display:flex;align-items:center;gap:8px;background:var(--bg-muted);border-radius:12px;padding:14px 16px;border:1px solid var(--border-subtle)}
+    .route-point{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-primary);font-weight:600;flex:1;min-width:0}
+    .route-point span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .route-point mat-icon{font-size:15px;width:15px;height:15px;flex-shrink:0}
+    .route-point.from mat-icon{color:var(--color-primary)}
+    .route-point.to mat-icon{color:var(--color-secondary)}
+    .route-arrow{color:var(--text-muted);display:flex;align-items:center;flex-shrink:0}
     .route-arrow mat-icon{font-size:18px;width:18px;height:18px}
-    .schedules-section{border-top:1px solid #EDF1D6;padding-top:12px;display:flex;flex-direction:column;gap:8px}
-    .schedules-title{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#40513B;text-transform:uppercase;letter-spacing:0.5px}
-    .schedules-title mat-icon{font-size:16px;width:16px;height:16px;color:#9DC08B}
-    .schedule-list{display:flex;flex-direction:column;gap:6px}
-    .schedule-row{display:flex;align-items:center;gap:8px;background:#f8faf5;border-radius:8px;padding:10px 12px;border:1px solid #EDF1D6}
+
+    /* Schedules */
+    .schedules-section{border-top:1px solid var(--border-subtle);padding-top:14px;display:flex;flex-direction:column;gap:10px}
+    .schedules-title{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--color-primary);text-transform:uppercase;letter-spacing:0.8px}
+    .schedules-title mat-icon{font-size:16px;width:16px;height:16px}
+    .schedule-list{display:flex;flex-direction:column;gap:8px}
+    .schedule-row{display:flex;align-items:center;gap:8px;background:var(--bg-muted);border-radius:10px;padding:12px 14px;border:1px solid var(--border-subtle);transition:background 0.15s}
+    .schedule-row:hover{background:var(--bg-hover)}
     .time-block{display:flex;flex-direction:column;align-items:center;flex:1}
-    .time-label{font-size:10px;color:#9DC08B;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
-    .time-value{font-size:15px;font-weight:700;color:#40513B}
-    .date-value{font-size:11px;color:#999}
-    .time-divider{color:#9DC08B;display:flex;align-items:center}
-    .time-divider mat-icon{font-size:16px;width:16px;height:16px}
-    .sched-status{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase;white-space:nowrap}
-    .sched-status.scheduled{background:#EDF1D6;color:#40513B}
-    .sched-status.on_time{background:#e8f5e9;color:#2e7d32}
-    .sched-status.delayed{background:#fff3e0;color:#e65100}
-    .sched-status.cancelled{background:#ffebee;color:#c62828}
-    .no-schedule{display:flex;align-items:center;gap:6px;font-size:12px;color:#bbb;padding:6px 0}
+    .time-label{font-size:10px;color:var(--color-primary);text-transform:uppercase;letter-spacing:0.5px;font-weight:700}
+    .time-value{font-size:16px;font-weight:800;color:var(--text-primary)}
+    .date-value{font-size:11px;color:var(--text-muted)}
+    .time-divider{color:var(--color-primary);display:flex;align-items:center;flex-shrink:0}
+    .time-divider mat-icon{font-size:18px;width:18px;height:18px}
+    .sched-status{padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;white-space:nowrap;letter-spacing:0.3px}
+    .sched-status.scheduled{background:var(--color-primary-light);color:var(--color-primary-dark)}
+    .sched-status.on_time{background:rgba(16,185,129,0.15);color:var(--color-success)}
+    .sched-status.delayed{background:rgba(245,158,11,0.15);color:var(--color-secondary-dark)}
+    .sched-status.cancelled{background:rgba(239,68,68,0.15);color:var(--color-danger)}
+    .no-schedule{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);padding:6px 0}
     .no-schedule mat-icon{font-size:16px;width:16px;height:16px}
-    .status-pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;white-space:nowrap}
-    .status-pill.active{background:#EDF1D6;color:#40513B}
-    .status-pill.inactive{background:#f5f5f5;color:#757575}
-    .status-pill.suspended{background:#ffebee;color:#c62828}
-    .empty-state{display:flex;flex-direction:column;align-items:center;gap:12px;padding:48px;color:#9DC08B}
-    .empty-state mat-icon{font-size:52px;width:52px;height:52px;opacity:0.5}
-    .empty-state p{font-size:15px;color:#aaa;margin:0}
+
+    /* Status pills */
+    .status-pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;white-space:nowrap;letter-spacing:0.3px}
+    .status-pill.active{background:rgba(16,185,129,0.15);color:var(--color-success)}
+    .status-pill.inactive{background:var(--bg-muted);color:var(--text-muted);border:1px solid var(--border-subtle)}
+    .status-pill.suspended{background:rgba(239,68,68,0.15);color:var(--color-danger)}
+
+    /* Empty state */
+    .empty-state{display:flex;flex-direction:column;align-items:center;gap:14px;padding:56px;color:var(--text-muted)}
+    .empty-state mat-icon{font-size:56px;width:56px;height:56px;color:var(--color-primary);opacity:0.3}
+    .empty-state p{font-size:15px;color:var(--text-muted);margin:0;font-weight:500}
   `]
 })
 export class CitizenRoutesComponent implements OnInit {

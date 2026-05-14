@@ -18,7 +18,7 @@ public class IncidentController {
     private final IncidentService incidentService;
 
     @PostMapping("/api/incidents")
-    @PreAuthorize("hasRole('CITIZEN') or hasRole('TRAFFIC_OFFICER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CITIZEN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('ADMIN')")
     public ResponseEntity<IncidentResponse> create(@Valid @RequestBody IncidentRequest request,
                                                    Authentication authentication) {
         String reporterIdStr = (String) authentication.getPrincipal();
@@ -27,13 +27,13 @@ public class IncidentController {
     }
 
     @GetMapping("/api/incidents/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_COMPANY') or hasRole('GOVERNMENT_OFFICER') or hasRole('CITIZEN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('COMPLIANCE_OFFICER') or hasRole('CITIZEN')")
     public ResponseEntity<IncidentResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(incidentService.getIncidentById(id));
     }
 
     @GetMapping("/api/incidents")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_COMPANY') or hasRole('GOVERNMENT_OFFICER') or hasRole('CITIZEN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('COMPLIANCE_OFFICER') or hasRole('CITIZEN')")
     public ResponseEntity<List<IncidentResponse>> getAll() {
         return ResponseEntity.ok(incidentService.getAllIncidents());
     }
@@ -57,7 +57,7 @@ public class IncidentController {
     }
 
     @GetMapping("/api/resolutions/incident/{incidentId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_COMPANY') or hasRole('GOVERNMENT_OFFICER') or hasRole('CITIZEN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAFFIC_OFFICER') or hasRole('TRANSPORT_OPERATOR') or hasRole('COMPLIANCE_OFFICER') or hasRole('CITIZEN')")
     public ResponseEntity<List<ResolutionResponse>> getResolutions(@PathVariable Long incidentId) {
         return ResponseEntity.ok(incidentService.getResolutionsByIncident(incidentId));
     }

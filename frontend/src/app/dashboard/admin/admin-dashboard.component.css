@@ -38,6 +38,14 @@
 .meta-chip mat-icon { font-size: 16px; width: 16px; height: 16px; color: var(--color-primary); }
 .meta-chip.warn { background: rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.4); }
 .meta-chip.warn mat-icon { color: var(--color-secondary); }
+.refresh-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+  color: white; cursor: pointer; transition: all 0.2s; position: relative;
+}
+.refresh-btn:hover { background: rgba(255,255,255,0.22); transform: rotate(180deg); }
+.refresh-btn mat-icon { font-size: 20px; width: 20px; height: 20px; }
 
 /* ── Stats Grid ──────────────────────────────────────────── */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }

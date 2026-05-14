@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators, FormsModule } from '@angular/forms';
@@ -17,6 +17,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { StatCardComponent } from '../../shared/components/stat-card.component';
 import { AuthService } from '../../core/services/auth.service';
 import { UserResponse, Role } from '../../core/models/auth.model';
+import { interval, Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -31,10 +33,12 @@ import { UserResponse, Role } from '../../core/models/auth.model';
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   pendingUsers: UserResponse[] = [];
   activeUsers: UserResponse[] = [];
   allUsers: UserResponse[] = [];
+  lastRefreshed = new Date();
+  private refreshSub!: Subscription;
 
   pendingCols = ['userId', 'name', 'email', 'phone', 'actions'];
   activeCols = ['userId', 'name', 'email', 'role', 'status', 'actions'];
@@ -65,14 +69,25 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAll();
+    // Auto-refresh every 30 seconds to stay in sync with DB
+    this.refreshSub = interval(30000).pipe(
+      switchMap(() => this.auth.getAllUsers())
+    ).subscribe(users => this.applyUsers(users));
+  }
+
+  ngOnDestroy(): void {
+    this.refreshSub?.unsubscribe();
   }
 
   loadAll(): void {
-    this.auth.getAllUsers().subscribe(users => {
-      this.allUsers = users;
-      this.pendingUsers = users.filter(u => u.status === 'PENDING');
-      this.activeUsers = users.filter(u => u.status !== 'PENDING');
-    });
+    this.auth.getAllUsers().subscribe(users => this.applyUsers(users));
+  }
+
+  private applyUsers(users: UserResponse[]): void {
+    this.allUsers = users;
+    this.pendingUsers = users.filter(u => u.status === 'PENDING');
+    this.activeUsers = users.filter(u => u.status !== 'PENDING');
+    this.lastRefreshed = new Date();
   }
 
   approve(user: UserResponse): void {

@@ -23,8 +23,6 @@
 .auth-header {
   background: linear-gradient(135deg, #0B2A35 0%, #0D3D4A 60%, #0F4D5C 100%);
   padding: 28px 24px;
-  text-align: center;
-  color: white;
   position: relative;
   overflow: hidden;
 }
@@ -35,9 +33,58 @@
   background: radial-gradient(circle at 50% 120%, var(--color-primary-glow) 0%, transparent 60%);
 }
 
-.brand-icon { font-size: 48px; width: 48px; height: 48px; color: var(--color-primary); position: relative; filter: drop-shadow(0 0 10px var(--color-primary-glow)); }
-.auth-header h1 { margin: 8px 0 4px; font-size: 24px; font-weight: 700; letter-spacing: 1px; position: relative; }
-.auth-header p  { margin: 0; font-size: 12px; opacity: 0.7; position: relative; }
+.auth-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  position: relative;
+}
+
+.auth-logo-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(13,148,136,0.45);
+  flex-shrink: 0;
+}
+
+.auth-logo-icon mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: white;
+}
+
+.auth-logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+}
+
+.auth-brand {
+  font-size: 26px;
+  font-weight: 900;
+  color: white;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.auth-accent {
+  color: var(--color-primary);
+}
+
+.auth-tagline {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
 
 mat-card-content { padding: 24px 28px 20px !important; }
 
