@@ -28,7 +28,7 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userRepository.count() > 0) {
+        if (userRepository.existsByEmail("admin@transpolink.com")) {
             log.info("Identity seeder skipped — data already exists.");
             return;
         }

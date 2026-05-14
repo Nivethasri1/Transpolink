@@ -12,6 +12,9 @@
     <div class="hero-meta">
       <div class="meta-chip"><mat-icon>people</mat-icon> {{ allUsers.length }} Total Users</div>
       <div class="meta-chip warn" *ngIf="pendingUsers.length > 0"><mat-icon>pending_actions</mat-icon> {{ pendingUsers.length }} Awaiting Approval</div>
+      <button class="refresh-btn" (click)="loadAll()" matTooltip="Refresh user data">
+        <mat-icon>refresh</mat-icon>
+      </button>
     </div>
   </div>
 

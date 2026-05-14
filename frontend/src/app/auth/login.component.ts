@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../core/services/auth.service';
+import { take } from 'rxjs/operators';
 
 type ErrorType = '' | 'pending' | 'rejected' | 'suspended' | 'invalid';
 
@@ -37,16 +38,19 @@ export class LoginComponent {
   }
 
   submit(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid || this.loading) return;  // guard double-submit
     this.loading = true;
     this.errorType = '';
     const { email, password } = this.form.value;
-    this.auth.login({ email: email!, password: password! }).subscribe({
-      next: () => this.auth.redirectToDashboard(),
+    this.auth.login({ email: email!, password: password! }).pipe(take(1)).subscribe({
+      next: () => {
+        // navigate returns Promise<boolean> — reset loading if navigation fails
+        this.auth.redirectToDashboard().catch(() => { this.loading = false; });
+      },
       error: (err) => {
         const msg: string = err.error?.message ?? '';
-        if (msg.toLowerCase().includes('pending')) this.errorType = 'pending';
-        else if (msg.toLowerCase().includes('rejected')) this.errorType = 'rejected';
+        if (msg.toLowerCase().includes('pending'))   this.errorType = 'pending';
+        else if (msg.toLowerCase().includes('rejected'))  this.errorType = 'rejected';
         else if (msg.toLowerCase().includes('suspended')) this.errorType = 'suspended';
         else this.errorType = 'invalid';
         this.loading = false;

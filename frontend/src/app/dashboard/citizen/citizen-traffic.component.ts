@@ -15,11 +15,14 @@ import { RoadSegmentResponse } from '../../core/models/traffic.model';
   template: `
     <div class="ct-page">
       <div class="ct-header">
-        <div class="ct-header-icon"><mat-icon>traffic</mat-icon></div>
-        <div>
-          <h2>Traffic Updates</h2>
-          <p>Live road segment status across the city</p>
+        <div class="ct-header-left">
+          <div class="ct-header-icon"><mat-icon>traffic</mat-icon></div>
+          <div>
+            <h2>Traffic Updates</h2>
+            <p>Live road segment status across the city</p>
+          </div>
         </div>
+        <div class="live-badge"><div class="live-dot"></div> Live Updates</div>
       </div>
 
       <div class="mini-stats">
@@ -54,51 +57,70 @@ import { RoadSegmentResponse } from '../../core/models/traffic.model';
     </div>
   `,
   styles: [`
-    .ct-page { display:flex; flex-direction:column; gap:20px; }
-    .ct-header { display:flex; align-items:center; gap:16px; background:linear-gradient(135deg,#40513B,#609966); border-radius:16px; padding:24px 28px; box-shadow:0 4px 20px rgba(64,81,59,0.3); }
-    .ct-header-icon { width:52px; height:52px; border-radius:14px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; }
-    .ct-header-icon mat-icon { font-size:28px; width:28px; height:28px; color:white; }
-    .ct-header h2 { font-size:22px; font-weight:700; color:white; margin:0 0 4px; }
-    .ct-header p  { font-size:13px; color:rgba(255,255,255,0.75); margin:0; }
+    .ct-page { display:flex; flex-direction:column; gap:24px; }
+
+    /* Header */
+    .ct-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; background:linear-gradient(135deg,#0B2A35,#0D3D4A,#0F4D5C); border-radius:20px; padding:28px 34px; box-shadow:0 8px 32px rgba(13,148,136,0.25); position:relative; overflow:hidden; }
+    .ct-header::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 85% 50%,rgba(13,148,136,0.18) 0%,transparent 55%); }
+    .ct-header::after  { content:''; position:absolute; right:-50px; top:-50px; width:240px; height:240px; border-radius:50%; border:2px solid rgba(13,148,136,0.12); pointer-events:none; }
+    .ct-header-left { display:flex; align-items:center; gap:18px; position:relative; }
+    .ct-header-icon { width:60px; height:60px; border-radius:18px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.2); }
+    .ct-header-icon mat-icon { font-size:32px; width:32px; height:32px; color:var(--color-primary); }
+    .ct-header h2 { font-size:22px; font-weight:800; color:white; margin:0 0 5px; }
+    .ct-header p  { font-size:13px; color:rgba(255,255,255,0.6); margin:0; }
+    .live-badge { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); border-radius:20px; padding:9px 18px; font-size:13px; font-weight:600; color:white; position:relative; }
+    .live-dot { width:8px; height:8px; border-radius:50%; background:var(--color-success); box-shadow:0 0 6px var(--color-success); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* Mini stats */
     .mini-stats { display:flex; gap:12px; flex-wrap:wrap; }
-    .mini-stat { display:flex; align-items:center; gap:8px; padding:10px 18px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; border:2px solid transparent; }
-    .mini-stat:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,0.1); }
-    .mini-stat mat-icon { font-size:18px; width:18px; height:18px; }
-    .mini-stat.open { background:#e8f5e9; color:#2e7d32; }
-    .mini-stat.congested { background:#fff3e0; color:#e65100; }
-    .mini-stat.closed { background:#ffebee; color:#c62828; }
-    .mini-stat.maintenance { background:#fce4ec; color:#880e4f; }
-    .mini-stat.total { background:#EDF1D6; color:#40513B; }
-    .mini-stat.active-filter { border-color:#40513B; box-shadow:0 4px 12px rgba(64,81,59,0.25); transform:translateY(-2px); }
-    .search-bar { display:flex; align-items:center; gap:10px; background:#f8faf5; border:2px solid #EDF1D6; border-radius:10px; padding:10px 14px; }
-    .search-bar:focus-within { border-color:#9DC08B; }
-    .search-bar mat-icon { color:#9DC08B; }
-    .search-bar input { flex:1; border:none; background:none; outline:none; font-size:14px; }
-    .search-bar button { background:none; border:none; cursor:pointer; color:#999; display:flex; align-items:center; }
-    .segment-list { display:flex; flex-direction:column; gap:8px; }
-    .segment-card { display:flex; align-items:center; justify-content:space-between; background:white; border-radius:10px; padding:14px 16px; border:1px solid #EDF1D6; border-left:4px solid #9DC08B; transition:box-shadow 0.2s; }
-    .segment-card:hover { box-shadow:0 2px 12px rgba(64,81,59,0.1); }
-    .segment-card.border-open { border-left-color:#4caf50; }
-    .segment-card.border-congested { border-left-color:#f44336; }
-    .segment-card.border-closed { border-left-color:#9e9e9e; }
-    .segment-card.border-under_maintenance { border-left-color:#ff9800; }
-    .seg-left { display:flex; align-items:center; gap:12px; }
-    .seg-dot { width:10px; height:10px; border-radius:50%; }
-    .seg-dot.open { background:#4caf50; box-shadow:0 0 6px rgba(76,175,80,0.5); }
-    .seg-dot.congested { background:#f44336; }
-    .seg-dot.closed { background:#9e9e9e; }
-    .seg-dot.under_maintenance { background:#ff9800; }
-    .seg-name { font-size:14px; font-weight:500; color:#333; }
-    .seg-len { display:flex; align-items:center; gap:4px; font-size:12px; color:#999; margin-top:2px; }
+    .mini-stat { display:flex; align-items:center; gap:10px; padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; border:1.5px solid var(--border-subtle); background:var(--bg-surface); color:var(--text-secondary); box-shadow:var(--shadow-sm); }
+    .mini-stat:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); border-color:var(--color-primary); }
+    .mini-stat mat-icon { font-size:20px; width:20px; height:20px; }
+    .mini-stat.total mat-icon { color:var(--color-primary); }
+    .mini-stat.open { color:var(--color-success); } .mini-stat.open mat-icon { color:var(--color-success); }
+    .mini-stat.congested { color:var(--color-danger); } .mini-stat.congested mat-icon { color:var(--color-danger); }
+    .mini-stat.closed { color:var(--text-muted); } .mini-stat.closed mat-icon { color:var(--text-muted); }
+    .mini-stat.maintenance { color:var(--color-secondary-dark); } .mini-stat.maintenance mat-icon { color:var(--color-secondary); }
+    .mini-stat.active-filter { border-color:var(--color-primary) !important; background:var(--color-primary-light); box-shadow:0 4px 14px var(--color-primary-glow); transform:translateY(-2px); }
+
+    /* Search */
+    .search-bar { display:flex; align-items:center; gap:10px; background:var(--bg-muted); border:1.5px solid var(--border-color); border-radius:10px; padding:10px 14px; transition:border-color 0.2s, box-shadow 0.2s; }
+    .search-bar:focus-within { border-color:var(--color-primary); box-shadow:0 0 0 3px var(--color-primary-glow); }
+    .search-bar mat-icon { color:var(--color-primary); }
+    .search-bar input { flex:1; border:none; background:none; outline:none; font-size:14px; color:var(--text-primary); }
+    .search-bar input::placeholder { color:var(--text-muted); }
+    .search-bar button { background:none; border:none; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; }
+
+    /* Segment list */
+    .segment-list { display:flex; flex-direction:column; gap:10px; }
+    .segment-card { display:flex; align-items:center; justify-content:space-between; background:var(--bg-surface); border-radius:14px; padding:16px 20px; border:1px solid var(--border-subtle); border-left:4px solid var(--border-color); box-shadow:var(--shadow-sm); transition:all 0.2s; }
+    .segment-card:hover { box-shadow:var(--shadow-md); transform:translateX(3px); }
+    .segment-card.border-open { border-left-color:var(--color-success); }
+    .segment-card.border-congested { border-left-color:var(--color-danger); }
+    .segment-card.border-closed { border-left-color:var(--text-muted); }
+    .segment-card.border-under_maintenance { border-left-color:var(--color-secondary); }
+    .seg-left { display:flex; align-items:center; gap:14px; }
+    .seg-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+    .seg-dot.open { background:var(--color-success); box-shadow:0 0 8px rgba(16,185,129,0.5); }
+    .seg-dot.congested { background:var(--color-danger); box-shadow:0 0 8px rgba(239,68,68,0.4); }
+    .seg-dot.closed { background:var(--text-muted); }
+    .seg-dot.under_maintenance { background:var(--color-secondary); box-shadow:0 0 8px rgba(245,158,11,0.4); }
+    .seg-name { font-size:14px; font-weight:600; color:var(--text-primary); }
+    .seg-len { display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-muted); margin-top:3px; }
     .seg-len mat-icon { font-size:13px; width:13px; height:13px; }
-    .status-pill { padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; text-transform:uppercase; white-space:nowrap; }
-    .status-pill.open { background:#e8f5e9; color:#2e7d32; }
-    .status-pill.congested { background:#ffebee; color:#c62828; }
-    .status-pill.closed { background:#f5f5f5; color:#757575; }
-    .status-pill.under_maintenance { background:#fff3e0; color:#e65100; }
-    .empty-state { display:flex; flex-direction:column; align-items:center; gap:12px; padding:48px; color:#9DC08B; }
-    .empty-state mat-icon { font-size:52px; width:52px; height:52px; opacity:0.5; }
-    .empty-state p { font-size:15px; color:#aaa; margin:0; }
+
+    /* Status pills */
+    .status-pill { padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; text-transform:uppercase; white-space:nowrap; letter-spacing:0.3px; }
+    .status-pill.open { background:rgba(16,185,129,0.15); color:var(--color-success); }
+    .status-pill.congested { background:rgba(239,68,68,0.15); color:var(--color-danger); }
+    .status-pill.closed { background:var(--bg-muted); color:var(--text-muted); border:1px solid var(--border-subtle); }
+    .status-pill.under_maintenance { background:rgba(245,158,11,0.15); color:var(--color-secondary-dark); }
+
+    /* Empty state */
+    .empty-state { display:flex; flex-direction:column; align-items:center; gap:14px; padding:56px; color:var(--text-muted); }
+    .empty-state mat-icon { font-size:56px; width:56px; height:56px; color:var(--color-primary); opacity:0.3; }
+    .empty-state p { font-size:15px; color:var(--text-muted); margin:0; font-weight:500; }
   `]
 })
 export class CitizenTrafficComponent implements OnInit {

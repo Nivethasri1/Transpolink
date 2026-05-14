@@ -54,7 +54,7 @@ export class AuthService {
     return id ? Number(id) : null;
   }
 
-  redirectToDashboard(): void {
+  redirectToDashboard(): Promise<boolean> {
     const role = this.getRole();
     const map: Record<Role, string> = {
       ADMIN:               '/admin',
@@ -63,7 +63,7 @@ export class AuthService {
       TRANSPORT_OPERATOR:  '/transport',
       COMPLIANCE_OFFICER:  '/government'
     };
-    this.router.navigate([role ? map[role] : '/login']);
+    return this.router.navigate([role ? map[role] : '/login']);
   }
 
   // ── Admin user-management methods ──────────────────────────────────────────
